@@ -28,6 +28,7 @@ var GRAY      = new Color(100, 100, 100);
 var DARKGRAY  = new Color( 40,  40,  40);
 
 
+
 function init()
 {
     window.onkeydown = key_down;
@@ -54,6 +55,9 @@ function init()
         APP_STATE = 'title';
         titleScreen();
     }
+    
+	var input = document.getElementById('input');
+	input.addEventListener('change', handleFiles, false);
 }
 
 function clearScreen()
@@ -106,6 +110,17 @@ function titleScreenLoop(t)
 
     CTX.restore();
     /***** end draw title text *****/
+}
+
+function handleFiles(e) {
+    var ctx = document.getElementById('canvas').getContext('2d');
+    var url = URL.createObjectURL(e.target.files[0]);
+    var img = new Image();
+    img.onload = function() {
+        ctx.drawImage(img, 20, 20);    
+    }
+    img.src = url;
+    
 }
 
 function drawGrid()
