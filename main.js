@@ -41,46 +41,46 @@ $(document).ready(function documentReady ()
         APP_STATE = 'title';
         titleScreen();
     }
-    
+
     canvas.on('dragover', function(e){
-		e.stopPropagation();
-		e.preventDefault();    
+        e.stopPropagation();
+        e.preventDefault();
     });
 
     canvas.on('dragenter', function(e){
-		e.stopPropagation();
-		e.preventDefault();    
+        e.stopPropagation();
+        e.preventDefault();
     });
 
     canvas.on('drop', function(e){
-		if(e.originalEvent.dataTransfer){
+        if(e.originalEvent.dataTransfer){
             if(e.originalEvent.dataTransfer.files.length) {
                 e.preventDefault();
                 e.stopPropagation();
-				
-				loadImage(e.originalEvent.dataTransfer.files[0]);
-            }   
+
+                loadImage(e.originalEvent.dataTransfer.files[0]);
+            }
         }
-    });    
+    });
 });
 
 function loadImage(file)
 {
-	var reader = new FileReader();
+    var reader = new FileReader();
 
-	reader.readAsDataURL(file);
-	
-	reader.onloadend = function(){
-		var source = this.result;
+    reader.readAsDataURL(file);
 
-		var img = new Image();
-		img.onload = function()
-		{
-			images.push(new ImageInfo(img, [100,100]));
-			drawScreen();
-		}
-		img.src = source; // triggers the load
-	};
+    reader.onloadend = function(){
+        var source = this.result;
+
+        var img = new Image();
+        img.onload = function()
+        {
+            images.push(new ImageInfo(img, [100,100]));
+            drawScreen();
+        }
+        img.src = source; // triggers the load
+    };
 }
 
 $(window).resize(function(){
@@ -210,18 +210,18 @@ function drawScreen()
     drawImages();
     drawGrid();
     drawPolygons();
-	manageCursor();
+    manageCursor();
 }
 
 function manageCursor()
 {
     if( APP_STATE == 'title' )
     {
-		document.body.style.cursor = "auto";
+        document.body.style.cursor = "auto";
     }
     else if( APP_STATE == 'mode' )
     {
-		document.body.style.cursor = "crosshair";
+        document.body.style.cursor = "crosshair";
     }
     else if( APP_STATE == 'end' )
     {
@@ -301,7 +301,7 @@ function keyDown(event)
             offset[1] += 30;
             return;
     }
-    
+
     lastEvent = event;
     heldKeys[event.which] = true;
 
