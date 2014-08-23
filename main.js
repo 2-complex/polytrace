@@ -15,7 +15,8 @@ var CELLHEIGHT = 100;
 
 
 // Colors of things
-var gridColor = "hsla(0,0%,50%,0.5)";
+var gridColor = "hsla(0, 0%, 50%, 0.5)";
+var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 
 function init()
 {
@@ -71,23 +72,23 @@ function titleScreenLoop(t)
     CTX.save();
     var w = 200;
     var h = 100;
-    CTX.fillStyle = DARKBLUE.hex();
+    CTX.fillStyle = "#00e";
     CTX.fillRect(-w, -h, 2*w, 2*h);
     CTX.restore();
 
     CTX.save();
-    CTX.fillStyle = BLACK.hex();
+    CTX.fillStyle = "#000";
     CTX.translate(0, 35);
     CTX.fillText("TRACE", 0,0);
     CTX.restore();
 
     CTX.save();
-    CTX.fillStyle = LIGHTBLUE.hex();
+    CTX.fillStyle = "#0ef";
     CTX.translate(0, -35);
     CTX.fillText("POLY", 0,0);
     CTX.restore();
 
-    CTX.fillStyle = GRAY.hex();
+    CTX.fillStyle = "#555";
     CTX.font = (20*Math.atan(Math.PI*t/1000)+40)+"px Arial";
     CTX.fillText("A tool for drawing a polygon path over an image.", 0,200);
 
@@ -153,15 +154,15 @@ function drawPolygons()
         var y = handles[i][1];
         var w = 4;
         var h = 4;
-        CTX.fillStyle = GREEN.hex();
-        CTX.strokeStyle = GREEN.hex();
+        CTX.fillStyle = polygonStrokeColor;
+        CTX.strokeStyle = polygonStrokeColor;
         CTX.strokeRect(x-w, y-w, 2*w, 2*h);
     }
 
     CTX.beginPath();
 
     CTX.lineWidth = 2;
-    CTX.strokeStyle = GREEN.hex();
+    CTX.strokeStyle = polygonStrokeColor;
     if ( handles.length > 0 )
     {
         var x = handles[0][0];
