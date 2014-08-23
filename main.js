@@ -42,7 +42,7 @@ $(document).ready(function documentReady ()
         APP_STATE = 'title';
         titleScreen();
     }
-    
+
 	input.change(handleFiles);
 });
 
@@ -80,23 +80,23 @@ function titleScreenLoop(t)
     ctx.save();
     var w = 200;
     var h = 100;
-    ctx.fillStyle = DARKBLUE.hex();
+    ctx.fillStyle = "#00f";
     ctx.fillRect(-w, -h, 2*w, 2*h);
     ctx.restore();
 
     ctx.save();
-    ctx.fillStyle = BLACK.hex();
+    ctx.fillStyle = "#000";
     ctx.translate(0, 35);
     ctx.fillText("TRACE", 0,0);
     ctx.restore();
 
     ctx.save();
-    ctx.fillStyle = LIGHTBLUE.hex();
+    ctx.fillStyle = "#0ef";
     ctx.translate(0, -35);
     ctx.fillText("POLY", 0,0);
     ctx.restore();
 
-    ctx.fillStyle = GRAY.hex();
+    ctx.fillStyle = "#555";
     ctx.font = (20*Math.atan(Math.PI*t/1000)+40)+"px Arial";
     ctx.fillText("A tool for drawing a polygon path over an image.", 0,200);
 
@@ -158,7 +158,7 @@ function drawPolygons()
 {
     for ( var i=0; i<polygons.length; i++ )
     {
-        polygons[i].draw();
+        polygons[i].draw(ctx);
     }
 }
 
