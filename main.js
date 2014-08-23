@@ -10,12 +10,15 @@ var handles = [[100,100]];
 var LOOP_ID = null;
 var APP_STATE = null;
 
-var CELLSIZE = 100;
-var COLUMNS = 32;
-var ROWS = 24;
-var CELLWIDTH = 20;
-var CELLHEIGHT = 20;
+// var CELLSIZE = 100;
+// var COLUMNS = 32;
+// var ROWS = 24;
+var CELLWIDTH = 100;
+var CELLHEIGHT = 100;
 
+
+// Colors of things
+var gridColor = LIGHTGRAY.hex();
 
 function init()
 {
@@ -35,10 +38,10 @@ function init()
         CANVAS.width = window.innerWidth;
         CANVAS.height = window.innerHeight;
 
-        COLUMNS = Math.floor(CANVAS.width/CELLSIZE);
-        ROWS = Math.floor(CANVAS.height/CELLSIZE);
-        CELLWIDTH = CANVAS.width/COLUMNS;
-        CELLHEIGHT = CANVAS.height/ROWS;
+//         COLUMNS = Math.floor(CANVAS.width/CELLSIZE);
+//         ROWS = Math.floor(CANVAS.height/CELLSIZE);
+//         CELLWIDTH = CANVAS.width/COLUMNS;
+//         CELLHEIGHT = CANVAS.height/ROWS;
 
         APP_STATE = 'title';
         titleScreen();
@@ -113,26 +116,29 @@ function handleFiles(e)
 
 function drawGrid()
 {
+	var columns = Math.floor(CANVAS.width/CELLWIDTH),
+        rows = Math.floor(CANVAS.height/CELLHEIGHT);
+
     CTX.save();
 
     CTX.lineWidth = "2";
-    CTX.strokeStyle = DARKGRAY.hex();
+    CTX.strokeStyle = gridColor;
 
     // draw vertical lines
-    for(var i=0; i<=COLUMNS; i++ )
+    for(var i = 1; i <= columns ; i++ )
     {
         CTX.beginPath();
         CTX.moveTo(i * CELLWIDTH, 0);
-        CTX.lineTo(i * CELLWIDTH, CELLHEIGHT * ROWS);
+        CTX.lineTo(i * CELLWIDTH, CANVAS.height);
         CTX.stroke();
     }
 
     // draw horizontal lines
-    for(var i=0; i<=ROWS; i++ )
+    for(var i = 1; i <= rows; i++ )
     {
         CTX.beginPath();
         CTX.moveTo(0,i*CELLHEIGHT);
-        CTX.lineTo(CELLWIDTH*COLUMNS,i*CELLHEIGHT);
+        CTX.lineTo(CANVAS.width,i*CELLHEIGHT);
         CTX.stroke();
     }
 
@@ -169,7 +175,7 @@ function drawPolygons()
         var x = handles[0][0];
         var y = handles[0][1];
         CTX.moveTo(x, y);
-    }
+}
 
     for ( var i=1; i<handles.length; i++ )
     {
