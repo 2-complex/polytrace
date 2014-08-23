@@ -10,15 +10,12 @@ var handles = [[100,100]];
 var LOOP_ID = null;
 var APP_STATE = null;
 
-// var CELLSIZE = 100;
-// var COLUMNS = 32;
-// var ROWS = 24;
 var CELLWIDTH = 100;
 var CELLHEIGHT = 100;
 
 
 // Colors of things
-var gridColor = LIGHTGRAY.hex();
+var gridColor = "hsla(0,0%,50%,0.5)";
 
 function init()
 {
@@ -37,11 +34,6 @@ function init()
 
         CANVAS.width = window.innerWidth;
         CANVAS.height = window.innerHeight;
-
-//         COLUMNS = Math.floor(CANVAS.width/CELLSIZE);
-//         ROWS = Math.floor(CANVAS.height/CELLSIZE);
-//         CELLWIDTH = CANVAS.width/COLUMNS;
-//         CELLHEIGHT = CANVAS.height/ROWS;
 
         APP_STATE = 'title';
         titleScreen();
@@ -116,8 +108,8 @@ function handleFiles(e)
 
 function drawGrid()
 {
-	var columns = Math.floor(CANVAS.width/CELLWIDTH),
-        rows = Math.floor(CANVAS.height/CELLHEIGHT);
+    var columns = Math.floor(CANVAS.width/CELLWIDTH);
+    var rows = Math.floor(CANVAS.height/CELLHEIGHT);
 
     CTX.save();
 
@@ -137,8 +129,8 @@ function drawGrid()
     for(var i = 1; i <= rows; i++ )
     {
         CTX.beginPath();
-        CTX.moveTo(0,i*CELLHEIGHT);
-        CTX.lineTo(CANVAS.width,i*CELLHEIGHT);
+        CTX.moveTo(0, i * CELLHEIGHT);
+        CTX.lineTo(CANVAS.width, i * CELLHEIGHT);
         CTX.stroke();
     }
 
@@ -190,9 +182,8 @@ function drawPolygons()
 function drawScreen()
 {
     clearScreen();
-    drawGrid();
-
     drawImages();
+    drawGrid();
     drawPolygons();
 }
 
