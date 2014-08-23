@@ -1,6 +1,5 @@
 var canvas;
 var ctx;
-var input;
 
 var lastEvent;
 var heldKeys = {};
@@ -23,7 +22,6 @@ var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 $(document).ready(function documentReady ()
 {
     canvas = $("#canvas");
-    input = $("#input");
 
     window.onkeydown = keyDown;
     window.onkeyup = keyUp;
@@ -43,9 +41,47 @@ $(document).ready(function documentReady ()
         APP_STATE = 'title';
         titleScreen();
     }
+    
+    canvas.on('dragover', function(e){
+		e.stopPropagation();
+		e.preventDefault();    
+    });
 
-    input.change(handleFiles);
+    canvas.on('dragenter', function(e){
+		e.stopPropagation();
+		e.preventDefault();    
+    });
+
+    canvas.on('drop', function(e){
+		if(e.originalEvent.dataTransfer){
+            if(e.originalEvent.dataTransfer.files.length) {
+                e.preventDefault();
+                e.stopPropagation();
+				
+				loadImage(e.originalEvent.dataTransfer.files[0]);
+            }   
+        }
+    });    
 });
+
+function loadImage(file)
+{
+	var reader = new FileReader();
+
+	reader.readAsDataURL(file);
+	
+	reader.onloadend = function(){
+		var source = this.result;
+
+		var img = new Image();
+		img.onload = function()
+		{
+			images.push(new ImageInfo(img, [100,100]));
+			drawScreen();
+		}
+		img.src = source; // triggers the load
+	};
+}
 
 $(window).resize(function(){
     canvas.attr('width', window.innerWidth);
@@ -105,16 +141,6 @@ function titleScreenLoop(t)
     /***** end draw title text *****/
 }
 
-function handleFiles(e)
-{
-    var url = URL.createObjectURL(e.target.files[0]);
-    var img = new Image();
-    img.onload = function()
-    {
-        images.push(new ImageInfo(img, [0,0]));
-    }
-    img.src = url; // triggers the load
-}
 
 function worldToCanvas(position)
 {
@@ -184,6 +210,22 @@ function drawScreen()
     drawImages();
     drawGrid();
     drawPolygons();
+	manageCursor();
+}
+
+function manageCursor()
+{
+    if( APP_STATE == 'title' )
+    {
+		document.body.style.cursor = "auto";
+    }
+    else if( APP_STATE == 'mode' )
+    {
+		document.body.style.cursor = "crosshair";
+    }
+    else if( APP_STATE == 'end' )
+    {
+    }
 }
 
 function mouseDown(event)
@@ -259,7 +301,7 @@ function keyDown(event)
             offset[1] += 30;
             return;
     }
-
+    
     lastEvent = event;
     heldKeys[event.which] = true;
 
@@ -269,8 +311,26 @@ function keyDown(event)
 function keyUp()
 {
     lastEvent = null;
-    delete(heldKeys[event.keyCode]); // Why is this keyCode and not which?
 
-    drawScreen();
+    if (lastEvent && lastEvent.which == event.which)
+    {
+        return;
+    }
+
+    // These will probably be useful later.
+    switch( event.which )
+    {
+        case 16: // shift
+        case 17: // ctrl
+        case 18: // alt
+        case 37: // left
+        case 38: // up
+        case 39: // right
+        case 40: // down
+        case 32: // space
+            return;
+    }
+
+    delete(heldKeys[event.keyCode]); // Why is this keyCode and not which?
 }
 
