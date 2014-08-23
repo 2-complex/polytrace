@@ -8,7 +8,7 @@ var heldKeys = {};
 var images = [];
 var polygons = [];
 var myPolygon = null;
-var offset = [300, 300];
+var offset = [0, 0];
 
 var LOOP_ID = null;
 var APP_STATE = null;
@@ -111,7 +111,7 @@ function handleFiles(e)
     var img = new Image();
     img.onload = function()
     {
-        images.push(img);
+        images.push(new ImageInfo(img, [0,0]));
     }
     img.src = url; // triggers the load
 }
@@ -166,7 +166,7 @@ function drawImages()
 {
     for ( var i=0; i<images.length; i++ )
     {
-        ctx.drawImage(images[i], 0, 0);
+        images[i].draw(ctx, worldToCanvas);
     }
 }
 
@@ -273,5 +273,4 @@ function key_up()
 
     drawScreen();
 }
-
 
