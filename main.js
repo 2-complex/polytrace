@@ -1,5 +1,6 @@
-var CANVAS;
-var CTX;
+var canvas;
+var ctx;
+var input;
 
 var lastEvent;
 var heldKeys = {};
@@ -14,44 +15,46 @@ var APP_STATE = null;
 var CELLWIDTH = 100;
 var CELLHEIGHT = 100;
 
-
-
 // Colors of things
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
 var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 
-
-
-function init()
+$(document).ready(function documentReady ()
 {
+	canvas = $("#canvas");
+	input = $("#input");
+
     window.onkeydown = key_down;
     window.onkeyup = key_up;
 
-    window.onmousemove = mouse_move;
-    window.onmouseup = mouse_up;
-    window.onmousedown = mouse_down;
-    window.ondblclick = double_click;
+	canvas.on("mousedown", mouse_down);
+	canvas.on("mouseup", mouse_up);
+	canvas.on("mousemove", mouse_move);
+	canvas.on("dblclick", double_click);
 
-    CANVAS = document.getElementById("canvas");
-
-    if( CANVAS.getContext )
+    if( canvas[0].getContext )
     {
-        CTX = CANVAS.getContext("2d");
+        ctx = canvas[0].getContext("2d");
 
-        CANVAS.width = window.innerWidth;
-        CANVAS.height = window.innerHeight;
+		canvas.attr('width', window.innerWidth);
+		canvas.attr('height', window.innerHeight);
 
         APP_STATE = 'title';
         titleScreen();
     }
+    
+	input.change(handleFiles);
+});
 
-    var input = document.getElementById('input');
-    input.addEventListener('change', handleFiles, false);
-}
+$(window).resize(function(){
+	canvas.attr('width', window.innerWidth);
+	canvas.attr('height', window.innerHeight);
+	drawScreen();
+});
 
 function clearScreen()
 {
-    CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+    ctx.clearRect(0, 0, canvas.width(), canvas.height());
 }
 
 function titleScreen()
@@ -67,37 +70,37 @@ function titleScreenLoop(t)
     clearScreen();
 
     /***** draw the title text *****/
-    CTX.save();
+    ctx.save();
 
-    CTX.textAlign = "center";
-    CTX.textBaseline = "middle";
-    CTX.font = "80px Arial";
-    CTX.translate(CANVAS.width/2, CANVAS.height/2);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "80px Arial";
+    ctx.translate(canvas.width()/2, canvas.height()/2);
 
-    CTX.save();
+    ctx.save();
     var w = 200;
     var h = 100;
-    CTX.fillStyle = "#00e";
-    CTX.fillRect(-w, -h, 2*w, 2*h);
-    CTX.restore();
+    ctx.fillStyle = DARKBLUE.hex();
+    ctx.fillRect(-w, -h, 2*w, 2*h);
+    ctx.restore();
 
-    CTX.save();
-    CTX.fillStyle = "#000";
-    CTX.translate(0, 35);
-    CTX.fillText("TRACE", 0,0);
-    CTX.restore();
+    ctx.save();
+    ctx.fillStyle = BLACK.hex();
+    ctx.translate(0, 35);
+    ctx.fillText("TRACE", 0,0);
+    ctx.restore();
 
-    CTX.save();
-    CTX.fillStyle = "#0ef";
-    CTX.translate(0, -35);
-    CTX.fillText("POLY", 0,0);
-    CTX.restore();
+    ctx.save();
+    ctx.fillStyle = LIGHTBLUE.hex();
+    ctx.translate(0, -35);
+    ctx.fillText("POLY", 0,0);
+    ctx.restore();
 
-    CTX.fillStyle = "#555";
-    CTX.font = (20*Math.atan(Math.PI*t/1000)+40)+"px Arial";
-    CTX.fillText("A tool for drawing a polygon path over an image.", 0,200);
+    ctx.fillStyle = GRAY.hex();
+    ctx.font = (20*Math.atan(Math.PI*t/1000)+40)+"px Arial";
+    ctx.fillText("A tool for drawing a polygon path over an image.", 0,200);
 
-    CTX.restore();
+    ctx.restore();
     /***** end draw title text *****/
 }
 
@@ -114,40 +117,40 @@ function handleFiles(e)
 
 function drawGrid()
 {
-    var columns = Math.floor(CANVAS.width/CELLWIDTH);
-    var rows = Math.floor(CANVAS.height/CELLHEIGHT);
+    var columns = Math.floor(canvas.width()/CELLWIDTH);
+    var rows = Math.floor(canvas.height()/CELLHEIGHT);
 
-    CTX.save();
+    ctx.save();
 
-    CTX.lineWidth = "2";
-    CTX.strokeStyle = gridColor;
+    ctx.lineWidth = "2";
+    ctx.strokeStyle = gridColor;
 
     // draw vertical lines
     for(var i = 1; i <= columns ; i++ )
     {
-        CTX.beginPath();
-        CTX.moveTo(i * CELLWIDTH, 0);
-        CTX.lineTo(i * CELLWIDTH, CANVAS.height);
-        CTX.stroke();
+        ctx.beginPath();
+        ctx.moveTo(i * CELLWIDTH, 0);
+        ctx.lineTo(i * CELLWIDTH, canvas.height());
+        ctx.stroke();
     }
 
     // draw horizontal lines
     for(var i = 1; i <= rows; i++ )
     {
-        CTX.beginPath();
-        CTX.moveTo(0, i * CELLHEIGHT);
-        CTX.lineTo(CANVAS.width, i * CELLHEIGHT);
-        CTX.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, i * CELLHEIGHT);
+        ctx.lineTo(canvas.width(), i * CELLHEIGHT);
+        ctx.stroke();
     }
 
-    CTX.restore();
+    ctx.restore();
 }
 
 function drawImages()
 {
     for ( var i=0; i<images.length; i++ )
     {
-        CTX.drawImage(images[i], 100, 100);
+        ctx.drawImage(images[i], 100, 100);
     }
 }
 
