@@ -8,6 +8,7 @@ var heldKeys = {};
 var images = [];
 var polygons = [];
 var myPolygon = null;
+var offset = [0,0];
 
 var LOOP_ID = null;
 var APP_STATE = null;
@@ -21,35 +22,35 @@ var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 
 $(document).ready(function documentReady ()
 {
-	canvas = $("#canvas");
-	input = $("#input");
+    canvas = $("#canvas");
+    input = $("#input");
 
     window.onkeydown = key_down;
     window.onkeyup = key_up;
 
-	canvas.on("mousedown", mouse_down);
-	canvas.on("mouseup", mouse_up);
-	canvas.on("mousemove", mouse_move);
-	canvas.on("dblclick", double_click);
+    canvas.on("mousedown", mouse_down);
+    canvas.on("mouseup", mouse_up);
+    canvas.on("mousemove", mouse_move);
+    canvas.on("dblclick", double_click);
 
     if( canvas[0].getContext )
     {
         ctx = canvas[0].getContext("2d");
 
-		canvas.attr('width', window.innerWidth);
-		canvas.attr('height', window.innerHeight);
+        canvas.attr('width', window.innerWidth);
+        canvas.attr('height', window.innerHeight);
 
         APP_STATE = 'title';
         titleScreen();
     }
 
-	input.change(handleFiles);
+    input.change(handleFiles);
 });
 
 $(window).resize(function(){
-	canvas.attr('width', window.innerWidth);
-	canvas.attr('height', window.innerHeight);
-	drawScreen();
+    canvas.attr('width', window.innerWidth);
+    canvas.attr('height', window.innerHeight);
+    drawScreen();
 });
 
 function clearScreen()
@@ -115,6 +116,16 @@ function handleFiles(e)
     img.src = url; // triggers the load
 }
 
+function worldToCanvas(position)
+{
+    return [position[0] + offset[0], position[1] + offset[1]];
+}
+
+function canvasToWorld(position)
+{
+    return [position[0] - offset[0], position[1] - offset[1]];
+}
+
 function drawGrid()
 {
     var columns = Math.floor(canvas.width()/CELLWIDTH);
@@ -150,7 +161,7 @@ function drawImages()
 {
     for ( var i=0; i<images.length; i++ )
     {
-        ctx.drawImage(images[i], 100, 100);
+        ctx.drawImage(images[i], 0, 0);
     }
 }
 
@@ -158,7 +169,7 @@ function drawPolygons()
 {
     for ( var i=0; i<polygons.length; i++ )
     {
-        polygons[i].draw(ctx);
+        polygons[i].draw(ctx, worldToCanvas);
     }
 }
 
@@ -186,7 +197,8 @@ function mouse_down(event)
             polygons.push(myPolygon);
         }
 
-        myPolygon.vertices.push([event.offsetX, event.offsetY]);
+        var clickPosition = [event.offsetX, event.offsetY];
+        myPolygon.vertices.push(canvasToWorld(clickPosition));
     }
     else if( APP_STATE == 'end' )
     {
@@ -202,6 +214,8 @@ function double_click()
         myPolygon.close();
         myPolygon = null;
     }
+
+    drawScreen();
 }
 
 function mouse_move(event)
@@ -236,12 +250,16 @@ function key_down(event)
 
     lastEvent = event;
     heldKeys[event.which] = true;
+
+    drawScreen();
 }
 
 function key_up()
 {
     lastEvent = null;
     delete(heldKeys[event.keyCode]); // Why is this keyCode and not which?
+
+    drawScreen();
 }
 
 
