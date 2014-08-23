@@ -15,7 +15,6 @@ function Color()
         this.b = arguments[0].b;
         this.a = arguments[0].a;
     }
-
 }
 
 Color.prototype.hex = function()

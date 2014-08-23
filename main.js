@@ -5,7 +5,8 @@ var lastEvent;
 var heldKeys = {};
 
 var images = [];
-var handles = [[100,100]];
+var polygons = [];
+var myPolygon = null;
 
 var LOOP_ID = null;
 var APP_STATE = null;
@@ -14,9 +15,65 @@ var CELLWIDTH = 100;
 var CELLHEIGHT = 100;
 
 
+function Polygon()
+{
+    this.vertices = [];
+    this.closed = false;
+}
+
+Polygon.prototype.draw = function()
+{
+    for ( var i=0; i<this.vertices.length; i++ )
+    {
+        var x = this.vertices[i][0];
+        var y = this.vertices[i][1];
+        var w = 4;
+        var h = 4;
+        CTX.fillStyle = polygonStrokeColor;
+        CTX.strokeStyle = polygonStrokeColor;
+        CTX.strokeRect(x-w, y-w, 2*w, 2*h);
+    }
+
+    if( this.vertices.length > 0 )
+    {
+        CTX.beginPath();
+
+        CTX.lineWidth = 2;
+        CTX.strokeStyle = polygonStrokeColor;
+
+        var x = this.vertices[0][0];
+        var y = this.vertices[0][1];
+        CTX.moveTo(x, y);
+
+        for ( var i=1; i<this.vertices.length; i++ )
+        {
+            var x = this.vertices[i][0];
+            var y = this.vertices[i][1];
+            CTX.lineTo(x, y);
+        }
+
+        if( this.closed )
+        {
+            var x = this.vertices[0][0];
+            var y = this.vertices[0][1];
+            CTX.lineTo(x, y);
+        }
+
+        CTX.stroke();
+    }
+}
+
+Polygon.prototype.close = function()
+{
+    this.closed = true;
+}
+
+
 // Colors of things
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
 var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
+
+
 
 function init()
 {
@@ -26,6 +83,7 @@ function init()
     window.onmousemove = mouse_move;
     window.onmouseup = mouse_up;
     window.onmousedown = mouse_down;
+    window.ondblclick = double_click;
 
     CANVAS = document.getElementById("canvas");
 
@@ -148,36 +206,10 @@ function drawImages()
 
 function drawPolygons()
 {
-    for ( var i=0; i<handles.length; i++ )
+    for ( var i=0; i<polygons.length; i++ )
     {
-        var x = handles[i][0];
-        var y = handles[i][1];
-        var w = 4;
-        var h = 4;
-        CTX.fillStyle = polygonStrokeColor;
-        CTX.strokeStyle = polygonStrokeColor;
-        CTX.strokeRect(x-w, y-w, 2*w, 2*h);
+        polygons[i].draw();
     }
-
-    CTX.beginPath();
-
-    CTX.lineWidth = 2;
-    CTX.strokeStyle = polygonStrokeColor;
-    if ( handles.length > 0 )
-    {
-        var x = handles[0][0];
-        var y = handles[0][1];
-        CTX.moveTo(x, y);
-}
-
-    for ( var i=1; i<handles.length; i++ )
-    {
-        var x = handles[i][0];
-        var y = handles[i][1];
-        CTX.lineTo(x, y);
-    }
-
-    CTX.stroke();
 }
 
 function drawScreen()
@@ -198,13 +230,28 @@ function mouse_down(event)
     }
     else if( APP_STATE == 'mode' )
     {
-        handles.push([event.clientX, event.clientY]);
+        if( myPolygon == null )
+        {
+            myPolygon = new Polygon();
+            polygons.push(myPolygon);
+        }
+
+        myPolygon.vertices.push([event.offsetX, event.offsetY]);
     }
     else if( APP_STATE == 'end' )
     {
     }
 
     drawScreen();
+}
+
+function double_click()
+{
+    if( APP_STATE == 'mode' )
+    {
+        myPolygon.close();
+        myPolygon = null;
+    }
 }
 
 function mouse_move(event)
