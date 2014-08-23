@@ -89,7 +89,6 @@ Color.prototype.desaturate = function(multiplier)
 
 Color.from_hsl = function(h,s,l)
 {
-
     // convert back to rgb
     var C = (1-Math.abs(2*l-1))*s;
     var Hprime = 3*h/Math.PI;
@@ -115,3 +114,15 @@ Color.from_hsl = function(h,s,l)
 
 }
 
+
+var WHITE = new Color(255, 255, 255);
+var BLACK = new Color(  0,   0,   0);
+var RED = new Color(255,   0,   0);
+var GREEN = new Color(  0, 255,   0);
+var BLUE = new Color(  0,   0, 255);
+var LIGHTBLUE = new Color(150, 150, 255);
+var DARKGREEN = new Color(  0, 155,   0);
+var DARKBLUE = new Color(  0,   0, 200);
+var LIGHTGRAY = new Color(150, 150, 150);
+var GRAY = new Color(100, 100, 100);
+var DARKGRAY = new Color( 40,  40,  40);

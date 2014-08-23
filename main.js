@@ -5,6 +5,7 @@ var lastEvent;
 var heldKeys = {};
 
 var images = [];
+var handles = [[100,100]];
 
 var LOOP_ID = null;
 var APP_STATE = null;
@@ -14,18 +15,6 @@ var COLUMNS = 32;
 var ROWS = 24;
 var CELLWIDTH = 20;
 var CELLHEIGHT = 20;
-
-var WHITE = new Color(255, 255, 255);
-var BLACK = new Color(  0,   0,   0);
-var RED = new Color(255,   0,   0);
-var GREEN = new Color(  0, 255,   0);
-var BLUE = new Color(  0,   0, 255);
-var LIGHTBLUE = new Color(150, 150, 255);
-var DARKGREEN = new Color(  0, 155,   0);
-var DARKBLUE = new Color(  0,   0, 200);
-var LIGHTGRAY = new Color(150, 150, 150);
-var GRAY = new Color(100, 100, 100);
-var DARKGRAY = new Color( 40,  40,  40);
 
 
 function init()
@@ -160,7 +149,36 @@ function drawImages()
 
 function drawPolygons()
 {
+    for ( var i=0; i<handles.length; i++ )
+    {
+        var x = handles[i][0];
+        var y = handles[i][1];
+        var w = 4;
+        var h = 4;
+        CTX.fillStyle = GREEN.hex();
+        CTX.strokeStyle = GREEN.hex();
+        CTX.strokeRect(x-w, y-w, 2*w, 2*h);
+    }
 
+    CTX.beginPath();
+
+    CTX.lineWidth = 2;
+    CTX.strokeStyle = GREEN.hex();
+    if ( handles.length > 0 )
+    {
+        var x = handles[0][0];
+        var y = handles[0][1];
+        CTX.moveTo(x, y);
+    }
+
+    for ( var i=1; i<handles.length; i++ )
+    {
+        var x = handles[i][0];
+        var y = handles[i][1];
+        CTX.lineTo(x, y);
+    }
+
+    CTX.stroke();
 }
 
 function drawScreen()
@@ -174,7 +192,6 @@ function drawScreen()
 
 function mouse_down(event)
 {
-    // if we're in the title screen
     if( APP_STATE == 'title' )
     {
         drawScreen();
@@ -183,7 +200,7 @@ function mouse_down(event)
     }
     else if( APP_STATE == 'mode' )
     {
-
+        handles.push([event.clientX, event.clientY]);
     }
     else if( APP_STATE == 'end' )
     {
@@ -194,13 +211,11 @@ function mouse_down(event)
 
 function mouse_move(event)
 {
-
     drawScreen();
 }
 
 function mouse_up(event)
 {
-
     drawScreen();
 }
 
