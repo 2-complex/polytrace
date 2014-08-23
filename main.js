@@ -4,6 +4,8 @@ var CTX;
 var lastEvent;
 var heldKeys = {};
 
+var images = [];
+
 var LOOP_ID = null;
 var APP_STATE = null;
 
@@ -24,7 +26,6 @@ var DARKBLUE = new Color(  0,   0, 200);
 var LIGHTGRAY = new Color(150, 150, 150);
 var GRAY = new Color(100, 100, 100);
 var DARKGRAY = new Color( 40,  40,  40);
-
 
 
 function init()
@@ -116,9 +117,9 @@ function handleFiles(e)
     var img = new Image();
     img.onload = function()
     {
-        CTX.drawImage(img, 100, 100);
+        images.push(img);
     }
-    img.src = url;
+    img.src = url; // triggers the load
 }
 
 function drawGrid()
@@ -151,7 +152,10 @@ function drawGrid()
 
 function drawImages()
 {
-
+    for ( var i=0; i<images.length; i++ )
+    {
+        CTX.drawImage(images[i], 100, 100);
+    }
 }
 
 function drawPolygons()
