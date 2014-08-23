@@ -7,6 +7,7 @@ var heldKeys = {};
 var images = [];
 var polygons = [];
 var myPolygon = null;
+var offset = [0, 0];
 
 var LOOP_ID = null;
 var APP_STATE = null;
@@ -20,23 +21,23 @@ var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 
 $(document).ready(function documentReady ()
 {
-	canvas = $("#canvas");
-	input = $("#input");
+    canvas = $("#canvas");
+    input = $("#input");
 
     window.onkeydown = key_down;
     window.onkeyup = key_up;
 
-	canvas.on("mousedown", mouse_down);
-	canvas.on("mouseup", mouse_up);
-	canvas.on("mousemove", mouse_move);
-	canvas.on("dblclick", double_click);
+    canvas.on("mousedown", mouse_down);
+    canvas.on("mouseup", mouse_up);
+    canvas.on("mousemove", mouse_move);
+    canvas.on("dblclick", double_click);
 
     if( canvas[0].getContext )
     {
         ctx = canvas[0].getContext("2d");
 
-		canvas.attr('width', window.innerWidth);
-		canvas.attr('height', window.innerHeight);
+        canvas.attr('width', window.innerWidth);
+        canvas.attr('height', window.innerHeight);
 
         APP_STATE = 'title';
         titleScreen();
@@ -86,9 +87,9 @@ function loadImage(file)
 }
 
 $(window).resize(function(){
-	canvas.attr('width', window.innerWidth);
-	canvas.attr('height', window.innerHeight);
-	drawScreen();
+    canvas.attr('width', window.innerWidth);
+    canvas.attr('height', window.innerHeight);
+    drawScreen();
 });
 
 function clearScreen()
@@ -143,6 +144,28 @@ function titleScreenLoop(t)
     /***** end draw title text *****/
 }
 
+
+function worldToCanvas(position)
+{
+    return [position[0] + offset[0], position[1] + offset[1]];
+}
+
+function canvasToWorld(position)
+{
+    return [position[0] - offset[0], position[1] - offset[1]];
+}
+
+function drawLine(p, q)
+{
+    var pw = worldToCanvas(p);
+    var qw = worldToCanvas(q);
+
+    ctx.beginPath();
+    ctx.moveTo(pw[0], pw[1]);
+    ctx.lineTo(qw[0], qw[1]);
+    ctx.stroke();
+}
+
 function drawGrid()
 {
     var columns = Math.floor(canvas.width()/CELLWIDTH);
@@ -156,19 +179,13 @@ function drawGrid()
     // draw vertical lines
     for(var i = 1; i <= columns ; i++ )
     {
-        ctx.beginPath();
-        ctx.moveTo(i * CELLWIDTH, 0);
-        ctx.lineTo(i * CELLWIDTH, canvas.height());
-        ctx.stroke();
+        drawLine( [i * CELLWIDTH, 0], [i * CELLWIDTH, canvas.height()] );
     }
 
     // draw horizontal lines
     for(var i = 1; i <= rows; i++ )
     {
-        ctx.beginPath();
-        ctx.moveTo(0, i * CELLHEIGHT);
-        ctx.lineTo(canvas.width(), i * CELLHEIGHT);
-        ctx.stroke();
+        drawLine( [0, i * CELLHEIGHT], [canvas.width(), i * CELLHEIGHT] );
     }
 
     ctx.restore();
@@ -178,7 +195,7 @@ function drawImages()
 {
     for ( var i=0; i<images.length; i++ )
     {
-        ctx.drawImage(images[i], 100, 100);
+        images[i].draw(ctx, worldToCanvas);
     }
 }
 
@@ -186,7 +203,7 @@ function drawPolygons()
 {
     for ( var i=0; i<polygons.length; i++ )
     {
-        polygons[i].draw(ctx);
+        polygons[i].draw(ctx, worldToCanvas);
     }
 }
 
@@ -230,7 +247,8 @@ function mouse_down(event)
             polygons.push(myPolygon);
         }
 
-        myPolygon.vertices.push([event.offsetX, event.offsetY]);
+        var clickPosition = [event.offsetX, event.offsetY];
+        myPolygon.vertices.push(canvasToWorld(clickPosition));
     }
     else if( APP_STATE == 'end' )
     {
@@ -245,8 +263,9 @@ function double_click()
     {
         myPolygon.close();
         myPolygon = null;
-		drawScreen();
     }
+
+    drawScreen();
 }
 
 function mouse_move(event)
@@ -273,15 +292,23 @@ function key_down(event)
         case 17: // ctrl
         case 18: // alt
         case 37: // left
+            offset[0] -= 30;
+            break;
         case 38: // up
+            offset[1] -= 30;
+            break;
         case 39: // right
+            offset[0] += 30;
+            break;
         case 40: // down
-        case 32: // space
+            offset[1] += 30;
             return;
     }
     
     lastEvent = event;
     heldKeys[event.which] = true;
+
+    drawScreen();
 }
 
 function key_up(event)
@@ -309,5 +336,4 @@ function key_up(event)
 
     delete(heldKeys[event.keyCode]); // Why is this keyCode and not which?
 }
-
 

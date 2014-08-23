@@ -1,17 +1,18 @@
 
-
 function Polygon()
 {
     this.vertices = [];
     this.closed = false;
 }
 
-Polygon.prototype.draw = function(ctx)
+Polygon.prototype.draw = function(ctx, convert)
 {
     for ( var i=0; i<this.vertices.length; i++ )
     {
-        var x = this.vertices[i][0];
-        var y = this.vertices[i][1];
+        var v = convert(this.vertices[i]);
+
+        var x = v[0]
+        var y = v[1];
         var w = 4;
         var h = 4;
         ctx.fillStyle = polygonStrokeColor;
@@ -26,22 +27,19 @@ Polygon.prototype.draw = function(ctx)
         ctx.lineWidth = 2;
         ctx.strokeStyle = polygonStrokeColor;
 
-        var x = this.vertices[0][0];
-        var y = this.vertices[0][1];
-        ctx.moveTo(x, y);
+        var v = convert(this.vertices[0]);
+        ctx.moveTo(v[0], v[1]);
 
         for ( var i=1; i<this.vertices.length; i++ )
         {
-            var x = this.vertices[i][0];
-            var y = this.vertices[i][1];
-            ctx.lineTo(x, y);
+            var v = convert(this.vertices[i]);
+            ctx.lineTo(v[0], v[1]);
         }
 
         if( this.closed )
         {
-            var x = this.vertices[0][0];
-            var y = this.vertices[0][1];
-            ctx.lineTo(x, y);
+            var v = convert(this.vertices[0]);
+            ctx.lineTo(v[0], v[1]);
         }
 
         ctx.stroke();
@@ -52,3 +50,4 @@ Polygon.prototype.close = function()
 {
     this.closed = true;
 }
+
