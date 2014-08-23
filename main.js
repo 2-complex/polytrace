@@ -22,7 +22,6 @@ var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 $(document).ready(function documentReady ()
 {
     canvas = $("#canvas");
-    input = $("#input");
 
     window.onkeydown = key_down;
     window.onkeyup = key_up;
@@ -63,8 +62,6 @@ $(document).ready(function documentReady ()
             }   
         }
     });    
-
-	input.change(handleFiles);
 });
 
 function loadImage(file)
@@ -79,7 +76,7 @@ function loadImage(file)
 		var img = new Image();
 		img.onload = function()
 		{
-			images.push(img);
+			images.push(new ImageInfo(img, [100,100]));
 			drawScreen();
 		}
 		img.src = source; // triggers the load
