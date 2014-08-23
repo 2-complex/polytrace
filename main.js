@@ -1,6 +1,5 @@
 var canvas;
 var ctx;
-var input;
 
 var lastEvent;
 var heldKeys = {};
@@ -42,9 +41,49 @@ $(document).ready(function documentReady ()
         APP_STATE = 'title';
         titleScreen();
     }
+    
+    canvas.on('dragover', function(e){
+		e.stopPropagation();
+		e.preventDefault();    
+    });
+
+    canvas.on('dragenter', function(e){
+		e.stopPropagation();
+		e.preventDefault();    
+    });
+
+    canvas.on('drop', function(e){
+		if(e.originalEvent.dataTransfer){
+            if(e.originalEvent.dataTransfer.files.length) {
+                e.preventDefault();
+                e.stopPropagation();
+				
+				loadImage(e.originalEvent.dataTransfer.files[0]);
+            }   
+        }
+    });    
 
 	input.change(handleFiles);
 });
+
+function loadImage(file)
+{
+	var reader = new FileReader();
+
+	reader.readAsDataURL(file);
+	
+	reader.onloadend = function(){
+		var source = this.result;
+
+		var img = new Image();
+		img.onload = function()
+		{
+			images.push(img);
+			drawScreen();
+		}
+		img.src = source; // triggers the load
+	};
+}
 
 $(window).resize(function(){
 	canvas.attr('width', window.innerWidth);
@@ -104,17 +143,6 @@ function titleScreenLoop(t)
     /***** end draw title text *****/
 }
 
-function handleFiles(e)
-{
-    var url = URL.createObjectURL(e.target.files[0]);
-    var img = new Image();
-    img.onload = function()
-    {
-        images.push(img);
-    }
-    img.src = url; // triggers the load
-}
-
 function drawGrid()
 {
     var columns = Math.floor(canvas.width()/CELLWIDTH);
@@ -168,6 +196,22 @@ function drawScreen()
     drawImages();
     drawGrid();
     drawPolygons();
+	manageCursor();
+}
+
+function manageCursor()
+{
+    if( APP_STATE == 'title' )
+    {
+		document.body.style.cursor = "auto";
+    }
+    else if( APP_STATE == 'mode' )
+    {
+		document.body.style.cursor = "crosshair";
+    }
+    else if( APP_STATE == 'end' )
+    {
+    }
 }
 
 function mouse_down(event)
@@ -201,6 +245,7 @@ function double_click()
     {
         myPolygon.close();
         myPolygon = null;
+		drawScreen();
     }
 }
 
@@ -231,16 +276,37 @@ function key_down(event)
         case 38: // up
         case 39: // right
         case 40: // down
+        case 32: // space
             return;
     }
-
+    
     lastEvent = event;
     heldKeys[event.which] = true;
 }
 
-function key_up()
+function key_up(event)
 {
     lastEvent = null;
+
+    if (lastEvent && lastEvent.which == event.which)
+    {
+        return;
+    }
+
+    // These will probably be useful later.
+    switch( event.which )
+    {
+        case 16: // shift
+        case 17: // ctrl
+        case 18: // alt
+        case 37: // left
+        case 38: // up
+        case 39: // right
+        case 40: // down
+        case 32: // space
+            return;
+    }
+
     delete(heldKeys[event.keyCode]); // Why is this keyCode and not which?
 }
 
