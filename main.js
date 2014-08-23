@@ -7,25 +7,23 @@ var heldKeys = {};
 var LOOP_ID = null;
 var APP_STATE = null;
 
-var GAMEFPS = 10;
-
 var CELLSIZE = 100;
 var COLUMNS = 32;
 var ROWS = 24;
 var CELLWIDTH = 20;
 var CELLHEIGHT = 20;
 
-var WHITE     = new Color(255, 255, 255);
-var BLACK     = new Color(  0,   0,   0);
-var RED       = new Color(255,   0,   0);
-var GREEN     = new Color(  0, 255,   0);
-var BLUE      = new Color(  0,   0, 255);
+var WHITE = new Color(255, 255, 255);
+var BLACK = new Color(  0,   0,   0);
+var RED = new Color(255,   0,   0);
+var GREEN = new Color(  0, 255,   0);
+var BLUE = new Color(  0,   0, 255);
 var LIGHTBLUE = new Color(150, 150, 255);
 var DARKGREEN = new Color(  0, 155,   0);
-var DARKBLUE  = new Color(  0,   0, 200);
+var DARKBLUE = new Color(  0,   0, 200);
 var LIGHTGRAY = new Color(150, 150, 150);
-var GRAY      = new Color(100, 100, 100);
-var DARKGRAY  = new Color( 40,  40,  40);
+var GRAY = new Color(100, 100, 100);
+var DARKGRAY = new Color( 40,  40,  40);
 
 
 
@@ -55,14 +53,14 @@ function init()
         APP_STATE = 'title';
         titleScreen();
     }
-    
-	var input = document.getElementById('input');
-	input.addEventListener('change', handleFiles, false);
+
+    var input = document.getElementById('input');
+    input.addEventListener('change', handleFiles, false);
 }
 
 function clearScreen()
 {
-    CTX.clearRect(0,0,CANVAS.width,CANVAS.height);
+    CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 }
 
 function titleScreen()
@@ -112,21 +110,19 @@ function titleScreenLoop(t)
     /***** end draw title text *****/
 }
 
-function handleFiles(e) {
-    var ctx = document.getElementById('canvas').getContext('2d');
+function handleFiles(e)
+{
     var url = URL.createObjectURL(e.target.files[0]);
     var img = new Image();
-    img.onload = function() {
-        ctx.drawImage(img, 20, 20);    
+    img.onload = function()
+    {
+        CTX.drawImage(img, 100, 100);
     }
     img.src = url;
-    
 }
 
 function drawGrid()
 {
-    clearScreen();
-
     CTX.save();
 
     CTX.lineWidth = "2";
@@ -136,8 +132,8 @@ function drawGrid()
     for(var i=0; i<=COLUMNS; i++ )
     {
         CTX.beginPath();
-        CTX.moveTo(i*CELLWIDTH,0);
-        CTX.lineTo(i*CELLWIDTH,CELLHEIGHT*ROWS);
+        CTX.moveTo(i * CELLWIDTH, 0);
+        CTX.lineTo(i * CELLWIDTH, CELLHEIGHT * ROWS);
         CTX.stroke();
     }
 
@@ -153,13 +149,31 @@ function drawGrid()
     CTX.restore();
 }
 
+function drawImages()
+{
+
+}
+
+function drawPolygons()
+{
+
+}
+
+function drawScreen()
+{
+    clearScreen();
+    drawGrid();
+
+    drawImages();
+    drawPolygons();
+}
 
 function mouse_down(event)
 {
     // if we're in the title screen
     if( APP_STATE == 'title' )
     {
-        drawGrid();
+        drawScreen();
         cancelAnimationFrame(LOOP_ID);
         APP_STATE = 'mode';
     }
@@ -169,18 +183,21 @@ function mouse_down(event)
     }
     else if( APP_STATE == 'end' )
     {
-
     }
-}
 
-function mouse_up(event)
-{
-
+    drawScreen();
 }
 
 function mouse_move(event)
 {
 
+    drawScreen();
+}
+
+function mouse_up(event)
+{
+
+    drawScreen();
 }
 
 function key_down(event)
@@ -212,3 +229,5 @@ function key_up()
     lastEvent = null;
     delete(heldKeys[event.keyCode]); // Why is this keyCode and not which?
 }
+
+
