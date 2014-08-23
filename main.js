@@ -7,7 +7,7 @@ var heldKeys = {};
 
 var images = [];
 var polygons = [];
-var myPolygon = null;
+var currentPolygon = null;
 var offset = [0, 0];
 
 var LOOP_ID = null;
@@ -25,13 +25,13 @@ $(document).ready(function documentReady ()
     canvas = $("#canvas");
     input = $("#input");
 
-    window.onkeydown = key_down;
-    window.onkeyup = key_up;
+    window.onkeydown = keyDown;
+    window.onkeyup = keyUp;
 
-    canvas.on("mousedown", mouse_down);
-    canvas.on("mouseup", mouse_up);
-    canvas.on("mousemove", mouse_move);
-    canvas.on("dblclick", double_click);
+    canvas.on("mousedown", mouseDown);
+    canvas.on("mouseup", mouseUp);
+    canvas.on("mousemove", mouseMove);
+    canvas.on("dblclick", doubleClick);
 
     if( canvas[0].getContext )
     {
@@ -186,7 +186,7 @@ function drawScreen()
     drawPolygons();
 }
 
-function mouse_down(event)
+function mouseDown(event)
 {
     if( APP_STATE == 'title' )
     {
@@ -196,14 +196,14 @@ function mouse_down(event)
     }
     else if( APP_STATE == 'mode' )
     {
-        if( myPolygon == null )
+        if( currentPolygon == null )
         {
-            myPolygon = new Polygon();
-            polygons.push(myPolygon);
+            currentPolygon = new Polygon();
+            polygons.push(currentPolygon);
         }
 
         var clickPosition = [event.offsetX, event.offsetY];
-        myPolygon.vertices.push(canvasToWorld(clickPosition));
+        currentPolygon.vertices.push(canvasToWorld(clickPosition));
     }
     else if( APP_STATE == 'end' )
     {
@@ -212,28 +212,28 @@ function mouse_down(event)
     drawScreen();
 }
 
-function double_click()
+function doubleClick()
 {
     if( APP_STATE == 'mode' )
     {
-        myPolygon.close();
-        myPolygon = null;
+        currentPolygon.close();
+        currentPolygon = null;
     }
 
     drawScreen();
 }
 
-function mouse_move(event)
+function mouseMove(event)
 {
     drawScreen();
 }
 
-function mouse_up(event)
+function mouseUp(event)
 {
     drawScreen();
 }
 
-function key_down(event)
+function keyDown(event)
 {
     if (lastEvent && lastEvent.which == event.which)
     {
@@ -266,7 +266,7 @@ function key_down(event)
     drawScreen();
 }
 
-function key_up()
+function keyUp()
 {
     lastEvent = null;
     delete(heldKeys[event.keyCode]); // Why is this keyCode and not which?
