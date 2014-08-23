@@ -8,7 +8,7 @@ var heldKeys = {};
 var images = [];
 var polygons = [];
 var myPolygon = null;
-var offset = [0,0];
+var offset = [0,500];
 
 var LOOP_ID = null;
 var APP_STATE = null;
@@ -126,6 +126,17 @@ function canvasToWorld(position)
     return [position[0] - offset[0], position[1] - offset[1]];
 }
 
+function drawLine(p, q)
+{
+    var pw = worldToCanvas(p);
+    var qw = worldToCanvas(q);
+
+    ctx.beginPath();
+    ctx.moveTo(pw[0], pw[1]);
+    ctx.lineTo(qw[0], qw[1]);
+    ctx.stroke();
+}
+
 function drawGrid()
 {
     var columns = Math.floor(canvas.width()/CELLWIDTH);
@@ -139,19 +150,13 @@ function drawGrid()
     // draw vertical lines
     for(var i = 1; i <= columns ; i++ )
     {
-        ctx.beginPath();
-        ctx.moveTo(i * CELLWIDTH, 0);
-        ctx.lineTo(i * CELLWIDTH, canvas.height());
-        ctx.stroke();
+        drawLine( [i * CELLWIDTH, 0], [i * CELLWIDTH, canvas.height()] );
     }
 
     // draw horizontal lines
     for(var i = 1; i <= rows; i++ )
     {
-        ctx.beginPath();
-        ctx.moveTo(0, i * CELLHEIGHT);
-        ctx.lineTo(canvas.width(), i * CELLHEIGHT);
-        ctx.stroke();
+        drawLine( [0, i * CELLHEIGHT], [canvas.width(), i * CELLHEIGHT] );
     }
 
     ctx.restore();
