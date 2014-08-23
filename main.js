@@ -8,7 +8,7 @@ var heldKeys = {};
 var images = [];
 var polygons = [];
 var myPolygon = null;
-var offset = [0,500];
+var offset = [300, 300];
 
 var LOOP_ID = null;
 var APP_STATE = null;
@@ -247,9 +247,16 @@ function key_down(event)
         case 17: // ctrl
         case 18: // alt
         case 37: // left
+            offset[0] -= 30;
+            break;
         case 38: // up
+            offset[1] -= 30;
+            break;
         case 39: // right
+            offset[0] += 30;
+            break;
         case 40: // down
+            offset[1] += 30;
             return;
     }
 
