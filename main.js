@@ -39,6 +39,8 @@ $(document).ready(function documentReady ()
     canvas.on("dblclick", doubleClick);
     canvas.on("mousewheel", mouseWheel);
 
+    $(window).on("resize", resize);
+
     if( canvas[0].getContext )
     {
         ctx = canvas[0].getContext("2d");
@@ -70,7 +72,7 @@ $(document).ready(function documentReady ()
             }
         }
     });
-    
+
     exportButton.on('mousedown', exportJSON);
 });
 
@@ -253,6 +255,14 @@ function manageCursor()
     else if( APP_STATE == 'end' )
     {
     }
+}
+
+function resize(event)
+{
+    canvas.attr('width', window.innerWidth);
+    canvas.attr('height', window.innerHeight);
+
+    drawScreen();
 }
 
 function mouseDown(event)
