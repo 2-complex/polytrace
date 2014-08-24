@@ -34,7 +34,7 @@ $(document).ready(function documentReady ()
     canvas.on("mouseup", mouseUp);
     canvas.on("mousemove", mouseMove);
     canvas.on("dblclick", doubleClick);
-    canvas.on("onmousewheel", mouseWheel);
+    canvas.on("mousewheel", mouseWheel);
 
     if( canvas[0].getContext )
     {
@@ -280,7 +280,10 @@ function doubleClick()
 
 function mouseWheel(event)
 {
-    alert("MOUSE WHEEL");
+    var delta = event.originalEvent.wheelDeltaY;
+    scaleFactor *= Math.pow(1.1, delta / 1000.0);
+
+    drawScreen();
 }
 
 function mouseMove(event)
