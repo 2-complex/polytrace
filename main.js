@@ -283,6 +283,15 @@ function mouseWheel(event)
     var delta = event.originalEvent.wheelDeltaY;
     scaleFactor *= Math.pow(1.1, delta / 1000.0);
 
+    if( scaleFactor > 10.0 )
+    {
+        scaleFactor = 10.0;
+    }
+    if( scaleFactor < 1.0 / 10.0 )
+    {
+        scaleFactor = 1.0 / 10.0;
+    }
+
     drawScreen();
 }
 
@@ -294,9 +303,9 @@ function mouseMove(event)
     {
         dragDown[0] = dragDiff[0] + v[0];
         dragDown[1] = dragDiff[1] + v[1];
-    }
 
-    drawScreen();
+        drawScreen();
+    }
 }
 
 function mouseUp(event)
