@@ -10,12 +10,16 @@ var images = [];
 var polygons = [];
 var currentPolygon = null;
 var offset = [0, 0];
+var scaleFactor = 1.0;
 
 var LOOP_ID = null;
 var APP_STATE = null;
 
 var CELLWIDTH = 100;
 var CELLHEIGHT = 100;
+
+var dragDown = null;
+var dragDiff = [0,0];
 
 // Colors of things
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
@@ -33,6 +37,7 @@ $(document).ready(function documentReady ()
     canvas.on("mouseup", mouseUp);
     canvas.on("mousemove", mouseMove);
     canvas.on("dblclick", doubleClick);
+    canvas.on("mousewheel", mouseWheel);
 
     if( canvas[0].getContext )
     {
@@ -44,54 +49,46 @@ $(document).ready(function documentReady ()
         APP_STATE = 'title';
         titleScreen();
     }
-    
+
     canvas.on('dragover', function(e){
-		e.stopPropagation();
-		e.preventDefault();    
+        e.stopPropagation();
+        e.preventDefault();
     });
 
     canvas.on('dragenter', function(e){
-		e.stopPropagation();
-		e.preventDefault();    
+        e.stopPropagation();
+        e.preventDefault();
     });
 
     canvas.on('drop', function(e){
-		if(e.originalEvent.dataTransfer){
+        if(e.originalEvent.dataTransfer){
             if(e.originalEvent.dataTransfer.files.length) {
                 e.preventDefault();
                 e.stopPropagation();
-				
-				loadImage(e.originalEvent.dataTransfer.files[0]);
-            }   
+
+                loadImage(e.originalEvent.dataTransfer.files[0]);
+            }
         }
-    });
-    
-    exportButton.on('mouseup', exportJSON);
-    
-    $(window).resize(function(){
-        canvas.attr('width', window.innerWidth);
-        canvas.attr('height', window.innerHeight);
-        drawScreen();
     });
 });
 
 function loadImage(file)
 {
-	var reader = new FileReader();
+    var reader = new FileReader();
 
-	reader.readAsDataURL(file);
-	
-	reader.onloadend = function(){
-		var source = this.result;
+    reader.readAsDataURL(file);
 
-		var img = new Image();
-		img.onload = function()
-		{
-			images.push(new ImageInfo(img, [100,100]));
-			drawScreen();
-		}
-		img.src = source; // triggers the load
-	};
+    reader.onloadend = function(){
+        var source = this.result;
+
+        var img = new Image();
+        img.onload = function()
+        {
+            images.push(new ImageInfo(img, [100,100]));
+            drawScreen();
+        }
+        img.src = source; // triggers the load
+    };
 }
 
 function exportJSON()
@@ -172,12 +169,12 @@ function titleScreenLoop(t)
 
 function worldToCanvas(position)
 {
-    return [position[0] + offset[0], position[1] + offset[1]];
+    return [scaleFactor * position[0] + offset[0], scaleFactor * position[1] + offset[1]];
 }
 
 function canvasToWorld(position)
 {
-    return [position[0] - offset[0], position[1] - offset[1]];
+    return [(position[0] - offset[0]) / scaleFactor, (position[1] - offset[1]) / scaleFactor];
 }
 
 function drawLine(p, q)
@@ -238,18 +235,18 @@ function drawScreen()
     drawImages();
     drawGrid();
     drawPolygons();
-	manageCursor();
+    manageCursor();
 }
 
 function manageCursor()
 {
     if( APP_STATE == 'title' )
     {
-		document.body.style.cursor = "auto";
+        document.body.style.cursor = "auto";
     }
     else if( APP_STATE == 'mode' )
     {
-		document.body.style.cursor = "crosshair";
+        document.body.style.cursor = "crosshair";
     }
     else if( APP_STATE == 'end' )
     {
@@ -266,14 +263,22 @@ function mouseDown(event)
     }
     else if( APP_STATE == 'mode' )
     {
-        if( currentPolygon == null )
-        {
-            currentPolygon = new Polygon();
-            polygons.push(currentPolygon);
-        }
+        var v = [event.offsetX, event.offsetY];
 
-        var clickPosition = [event.offsetX, event.offsetY];
-        currentPolygon.vertices.push(canvasToWorld(clickPosition));
+        if( event.button == 1 )
+        {
+            dragDown = offset;
+            dragDiff = [offset[0] - v[0], offset[1] - v[1]];
+        }
+        else
+        {
+            if( currentPolygon == null )
+            {
+                currentPolygon = new Polygon();
+                polygons.push(currentPolygon);
+            }
+            currentPolygon.vertices.push(canvasToWorld(v));
+        }
     }
     else if( APP_STATE == 'end' )
     {
@@ -293,13 +298,31 @@ function doubleClick()
     drawScreen();
 }
 
+function mouseWheel(event)
+{
+    var delta = event.originalEvent.wheelDeltaY;
+    scaleFactor *= Math.pow(1.1, delta / 1000.0);
+
+    drawScreen();
+}
+
 function mouseMove(event)
 {
+    var v = [event.offsetX, event.offsetY];
+
+    if( dragDown )
+    {
+        dragDown[0] = dragDiff[0] + v[0];
+        dragDown[1] = dragDiff[1] + v[1];
+    }
+
     drawScreen();
 }
 
 function mouseUp(event)
 {
+    dragDown = null;
+
     drawScreen();
 }
 
@@ -310,12 +333,21 @@ function keyDown(event)
         return;
     }
 
-    // These will probably be useful later.
     switch( event.which )
     {
         case 16: // shift
         case 17: // ctrl
         case 18: // alt
+        return;
+
+        case 187: // =
+            scaleFactor *= 1.1;
+        break;
+
+        case 189: // -
+            scaleFactor /= 1.1;
+        break;
+
         case 37: // left
             offset[0] -= 30;
             break;
@@ -327,9 +359,9 @@ function keyDown(event)
             break;
         case 40: // down
             offset[1] += 30;
-            return;
+            break;
     }
-    
+
     lastEvent = event;
     heldKeys[event.which] = true;
 
