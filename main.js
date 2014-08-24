@@ -1,5 +1,7 @@
 var canvas;
 var ctx;
+var exportButton;
+var exportWindow = null;
 
 var lastEvent;
 var heldKeys = {};
@@ -22,6 +24,7 @@ var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 $(document).ready(function documentReady ()
 {
     canvas = $("#canvas");
+    exportButton = $('button.export');
 
     window.onkeydown = keyDown;
     window.onkeyup = keyUp;
@@ -61,7 +64,15 @@ $(document).ready(function documentReady ()
 				loadImage(e.originalEvent.dataTransfer.files[0]);
             }   
         }
-    });    
+    });
+    
+    exportButton.on('mouseup', exportJSON);
+    
+    $(window).resize(function(){
+        canvas.attr('width', window.innerWidth);
+        canvas.attr('height', window.innerHeight);
+        drawScreen();
+    });
 });
 
 function loadImage(file)
@@ -83,11 +94,28 @@ function loadImage(file)
 	};
 }
 
-$(window).resize(function(){
-    canvas.attr('width', window.innerWidth);
-    canvas.attr('height', window.innerHeight);
-    drawScreen();
-});
+function exportJSON()
+{
+    if (exportWindow === null)
+    {
+        exportWindow = $('<div>').addClass('export').appendTo('body');
+        var exportData = $('<textarea>').prop('readonly', true).appendTo(exportWindow);
+        var closeButton = $('<button>').html('Close').appendTo(exportWindow);
+
+        exportData.val(JSON.stringify(polygons[0].vertices));
+
+        closeButton.on('mouseup', function(){
+            exportWindow.remove();
+            exportWindow = null;
+        });
+    }
+    else
+    {
+        exportWindow.remove();
+        exportWindow = null;
+    }
+}
+
 
 function clearScreen()
 {
