@@ -70,6 +70,8 @@ $(document).ready(function documentReady ()
             }
         }
     });
+    
+    exportButton.on('mousedown', exportJSON);
 });
 
 function loadImage(file)
