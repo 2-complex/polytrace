@@ -16,8 +16,7 @@ var scaleFactor = 1.0;
 var LOOP_ID = null;
 var APP_STATE = null;
 
-var CELLWIDTH = 100;
-var CELLHEIGHT = 100;
+var cellSize = 100;
 
 var dragDown = null;
 var dragDiff = [0,0];
@@ -196,8 +195,9 @@ function drawLine(p, q)
 
 function drawGrid()
 {
-    var columns = Math.floor(canvas.width()/CELLWIDTH);
-    var rows = Math.floor(canvas.height()/CELLHEIGHT);
+    var scaledCellSize = cellSize * scaleFactor;
+    var columns = Math.floor(canvas.width()/scaledCellSize);
+    var rows = Math.floor(canvas.height()/scaledCellSize);
 
     ctx.save();
 
@@ -207,13 +207,19 @@ function drawGrid()
     // draw vertical lines
     for(var i = 1; i <= columns ; i++ )
     {
-        drawLine( [i * CELLWIDTH, 0], [i * CELLWIDTH, canvas.height()] );
+        ctx.beginPath();
+        ctx.moveTo(i * scaledCellSize, 0);
+        ctx.lineTo(i * scaledCellSize, canvas.height());
+        ctx.stroke();
     }
 
     // draw horizontal lines
     for(var i = 1; i <= rows; i++ )
     {
-        drawLine( [0, i * CELLHEIGHT], [canvas.width(), i * CELLHEIGHT] );
+        ctx.beginPath();
+        ctx.moveTo(0, i * scaledCellSize);
+        ctx.lineTo(canvas.width(), i * scaledCellSize);
+        ctx.stroke();
     }
 
     ctx.restore();
