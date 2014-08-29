@@ -1,61 +1,73 @@
 *, *:before, *:after {
-  -moz-box-sizing: border-box !important; -webkit-box-sizing: border-box; box-sizing: border-box;
- }
+    -moz-box-sizing: border-box !important;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
 
 body {
-	margin: 0px;
-	padding: 0px;
-	background-color: #000;
-	text-align: center;
+    margin: 0px;
+    padding: 0px;
+    background-color: #000;
+    text-align: center;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 div.toolbar {
-	background: hsla(0, 0%, 40%, 0.8);
-	position: fixed;
-	left: 0px;
-	right: 0px;
-	text-align: left;
-	height: 32px;
-	padding: 4px;
+    background: hsla(0, 0%, 40%, 0.8);
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    text-align: left;
+    height: 32px;
+    padding: 4px;
+    
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
-div.toolbar button {
-	height: 24px;
-	background: none;
-	border: 1px solid #FFF;
-	color: #FFF;
-	border-radius: 3px;
+button {
+    height: 24px;
+    background: none;
+    border: 1px solid #FFF;
+    color: #FFF;
+    border-radius: 3px;
+    outline-width: 0;   
 }
 
-div.toolbar button:active {
-	background: #FFF;
-	color: #000;
+button:active,
+button.active {
+    background: #FFF;
+    color: #000;
 }
 
 div.export {
-	position: absolute;
-	background: hsla(210, 20%, 50%, 1);
-	width: 400px;
-	height: 300px;
-	top: 50px;
-	right: 50px;
-	z-index: 11;
+    position: absolute;
+    background: hsla(210, 20%, 50%, 1);
+    width: 400px;
+    height: 300px;
+    top: 50px;
+    right: 50px;
+    z-index: 11;
 }
 
 button.right.export {
-	float: right;
+    float: right;
 }
 
 div.export textarea {
-	position: absolute;
-	top: 5px;
-	left: 5px;
-	right: 5px;
-	bottom: 30px;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 30px;
 }
 
 div.export button {
-	position: absolute;
-	right: 5px;
-	bottom: 5px;
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
 }

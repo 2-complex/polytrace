@@ -1,3 +1,4 @@
+var body;
 var canvas;
 var ctx;
 var exportButton;
@@ -27,6 +28,7 @@ var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 
 $(document).ready(function documentReady ()
 {
+	body = $('body');
     canvas = $("#canvas");
     exportButton = $('button.export');
 
