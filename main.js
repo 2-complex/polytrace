@@ -207,30 +207,58 @@ function drawLine(p, q)
 
 function drawGrid()
 {
-    var scaledCellSize = cellSize * scaleFactor;
-    var columns = Math.floor(canvas.width()/scaledCellSize);
-    var rows = Math.floor(canvas.height()/scaledCellSize);
+    var ll = canvasToWorld([0, 0]);
+    var ur = canvasToWorld([canvas.width(), canvas.height()]);
+
+    var worldLeft = ll[0];
+    var worldBottom = ll[1];
+    var worldRight = ur[0];
+    var worldTop = ur[1];
+
+    worldLeft = Math.floor( worldLeft / cellSize ) * cellSize;
+    worldRight = (Math.floor( worldRight / cellSize ) + 1) * cellSize;
+
+    worldBottom = Math.floor( worldBottom / cellSize ) * cellSize;
+    worldTop = (Math.floor( worldTop / cellSize ) + 1) * cellSize;
+
+    var columns = (worldRight - worldLeft) / cellSize;
+    var rows = (worldTop - worldBottom) / cellSize;
 
     ctx.save();
 
-    ctx.lineWidth = "2";
+    ctx.lineWidth = "1";
     ctx.strokeStyle = gridColor;
 
+    var Z = [worldLeft, worldBottom];
+    console.log("(" + Z[0] + ", " + Z[1] + ")");
+    var Q = worldToCanvas(Z);
+    console.log("(" + Q[0] + ", " + Q[1] + ")");
+
     // draw vertical lines
-    for(var i = 1; i <= columns ; i++ )
+    for( var i = 1; i <= columns; i++ )
     {
         ctx.beginPath();
-        ctx.moveTo(i * scaledCellSize, 0);
-        ctx.lineTo(i * scaledCellSize, canvas.height());
+
+        var A = worldToCanvas([worldLeft + i * cellSize, worldBottom]);
+        var B = worldToCanvas([worldLeft + i * cellSize, worldTop]);
+
+        ctx.moveTo(A[0], A[1]);
+        ctx.lineTo(B[0], B[1]);
+
         ctx.stroke();
     }
 
     // draw horizontal lines
-    for(var i = 1; i <= rows; i++ )
+    for( var i = 1; i <= rows; i++ )
     {
         ctx.beginPath();
-        ctx.moveTo(0, i * scaledCellSize);
-        ctx.lineTo(canvas.width(), i * scaledCellSize);
+
+        var A = worldToCanvas([worldLeft, worldBottom + i * cellSize]);
+        var B = worldToCanvas([worldRight, worldBottom + i * cellSize]);
+
+        ctx.moveTo(A[0], A[1]);
+        ctx.lineTo(B[0], B[1]);
+
         ctx.stroke();
     }
 
