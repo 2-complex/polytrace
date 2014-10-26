@@ -104,7 +104,13 @@ function exportJSON()
         var exportData = $('<textarea>').prop('readonly', true).appendTo(exportWindow);
         var closeButton = $('<button>').html('Close').appendTo(exportWindow);
 
-        exportData.val(JSON.stringify(polygons[0].vertices));
+        var list = [];
+        for ( var i = 0; i < polyTraceDocument.polygons.length; i++ )
+        {
+            list.push(polyTraceDocument.polygons[i].vertices);
+        }
+
+        exportData.val( JSON.stringify(list) );
 
         closeButton.on('mouseup', function(){
             exportWindow.remove();
