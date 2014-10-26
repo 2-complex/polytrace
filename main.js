@@ -2,6 +2,8 @@ var body;
 var canvas;
 var ctx;
 var exportButton;
+var moveButton;
+var editButton;
 var exportWindow = null;
 
 var lastEvent;
@@ -15,11 +17,11 @@ var APP_STATE = null;
 
 var cellSize = 100;
 
-var dragDown = null;
-var dragDiff = [0,0];
-
 var polyTraceDocument = new PolyTraceDocument();
-var currentTool = new PolygonTool();
+var polygonTool = new PolygonTool();
+var handTool = new HandTool();
+
+var currentTool = polygonTool;
 
 // Colors of things
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
@@ -30,6 +32,8 @@ $(document).ready(function documentReady ()
     body = $('body');
     canvas = $("#canvas");
     exportButton = $('button.export');
+    moveButton = $('button.move');
+    editButton = $('button.edit');
 
     window.onkeydown = keyDown;
     window.onkeyup = keyUp;
@@ -75,6 +79,8 @@ $(document).ready(function documentReady ()
     });
 
     exportButton.on('mousedown', exportJSON);
+    moveButton.on('mousedown', function() {currentTool = handTool;} );
+    editButton.on('mousedown', function() {currentTool = polygonTool;});
 });
 
 function loadImage(file)
@@ -262,9 +268,13 @@ function manageCursor()
     {
         document.body.style.cursor = "auto";
     }
-    else if( APP_STATE == 'mode' )
+    else if( currentTool == polygonTool )
     {
         document.body.style.cursor = "crosshair";
+    }
+    else if( currentTool == handTool )
+    {
+        document.body.style.cursor = "hand";
     }
     else if( APP_STATE == 'end' )
     {
@@ -293,13 +303,14 @@ function mouseDown(event)
 
         if( event.button == 1 )
         {
-            dragDown = offset;
-            dragDiff = [offset[0] - v[0], offset[1] - v[1]];
+            // currentTool = handTool;
         }
-        else
-        {
-            currentTool.mouseDown(polyTraceDocument, canvasToWorld(v));
-        }
+
+        currentTool.mouseDown({
+            polyTraceDocument : polyTraceDocument,
+            worldLocation : canvasToWorld(v),
+            event : event,
+            offset : offset});
     }
     else if( APP_STATE == 'end' )
     {
@@ -312,7 +323,9 @@ function doubleClick()
 {
     if( APP_STATE == 'mode' )
     {
-        currentTool.doubleClick();
+        currentTool.doubleClick({
+            polyTraceDocument : polyTraceDocument,
+            event : event});
     }
 
     drawScreen();
@@ -339,18 +352,22 @@ function mouseMove(event)
 {
     var v = [event.offsetX, event.offsetY];
 
-    if( dragDown )
-    {
-        dragDown[0] = dragDiff[0] + v[0];
-        dragDown[1] = dragDiff[1] + v[1];
+    currentTool.mouseMove({
+        polyTraceDocument : polyTraceDocument,
+        worldLocation : canvasToWorld(v),
+        event : event});
 
-        drawScreen();
-    }
+    drawScreen();
 }
 
 function mouseUp(event)
 {
-    dragDown = null;
+    var v = [event.offsetX, event.offsetY];
+
+    currentTool.mouseUp({
+        polyTraceDocument : polyTraceDocument,
+        worldLocation : canvasToWorld(v),
+        event : event});
 
     drawScreen();
 }
