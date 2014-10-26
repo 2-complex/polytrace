@@ -7,9 +7,6 @@ var exportWindow = null;
 var lastEvent;
 var heldKeys = {};
 
-var images = [];
-var polygons = [];
-var currentPolygon = null;
 var offset = [0, 0];
 var scaleFactor = 1.0;
 
@@ -21,13 +18,16 @@ var cellSize = 100;
 var dragDown = null;
 var dragDiff = [0,0];
 
+var polyTraceDocument = new PolyTraceDocument();
+var currentTool = new PolygonTool();
+
 // Colors of things
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
 var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 
 $(document).ready(function documentReady ()
 {
-	body = $('body');
+    body = $('body');
     canvas = $("#canvas");
     exportButton = $('button.export');
 
@@ -89,7 +89,7 @@ function loadImage(file)
         var img = new Image();
         img.onload = function()
         {
-            images.push(new ImageInfo(img, [100,100]));
+            polyTraceDocument.images.push(new ImageInfo(img, [100,100]));
             drawScreen();
         }
         img.src = source; // triggers the load
@@ -227,17 +227,17 @@ function drawGrid()
 
 function drawImages()
 {
-    for ( var i=0; i<images.length; i++ )
+    for ( var i=0; i<polyTraceDocument.images.length; i++ )
     {
-        images[i].draw(ctx, worldToCanvas);
+        polyTraceDocument.images[i].draw(ctx, worldToCanvas);
     }
 }
 
 function drawPolygons()
 {
-    for ( var i=0; i<polygons.length; i++ )
+    for ( var i=0; i<polyTraceDocument.polygons.length; i++ )
     {
-        polygons[i].draw(ctx, worldToCanvas);
+        polyTraceDocument.polygons[i].draw(ctx, worldToCanvas);
     }
 }
 
@@ -292,12 +292,7 @@ function mouseDown(event)
         }
         else
         {
-            if( currentPolygon == null )
-            {
-                currentPolygon = new Polygon();
-                polygons.push(currentPolygon);
-            }
-            currentPolygon.vertices.push(canvasToWorld(v));
+            currentTool.mouseDown(polyTraceDocument, canvasToWorld(v));
         }
     }
     else if( APP_STATE == 'end' )
@@ -311,8 +306,7 @@ function doubleClick()
 {
     if( APP_STATE == 'mode' )
     {
-        currentPolygon.close();
-        currentPolygon = null;
+        currentTool.doubleClick();
     }
 
     drawScreen();
