@@ -229,10 +229,6 @@ function drawGrid()
     ctx.lineWidth = "1";
     ctx.strokeStyle = gridColor;
 
-    var Z = [worldLeft, worldBottom];
-    console.log("(" + Z[0] + ", " + Z[1] + ")");
-    var Q = worldToCanvas(Z);
-    console.log("(" + Q[0] + ", " + Q[1] + ")");
 
     // draw vertical lines
     for( var i = 1; i <= columns; i++ )
