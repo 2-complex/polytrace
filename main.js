@@ -358,8 +358,10 @@ function doubleClick()
 function mouseWheel(event)
 {
     var delta = event.originalEvent.wheelDeltaY;
-    scaleFactor *= Math.pow(1.1, delta / 1000.0);
 
+    var beforeMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
+
+    scaleFactor *= Math.pow(1.1, delta / 1000.0);
     if( scaleFactor > 10.0 )
     {
         scaleFactor = 10.0;
@@ -368,6 +370,13 @@ function mouseWheel(event)
     {
         scaleFactor = 1.0 / 10.0;
     }
+
+    var afterMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
+
+    var nudge = [ afterMiddle[0] - beforeMiddle[0], afterMiddle[1] - beforeMiddle[1] ];
+
+    offset[0] += nudge[0] * scaleFactor;
+    offset[1] += nudge[1] * scaleFactor;
 
     drawScreen();
 }
