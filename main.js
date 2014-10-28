@@ -21,7 +21,13 @@ var polyTraceDocument = new PolyTraceDocument();
 var polygonTool = new PolygonTool();
 var handTool = new HandTool();
 
-var currentTool = polygonTool;
+var selectedTool = polygonTool;
+var tempTool = null;
+
+function currentTool()
+{
+    return tempTool || selectedTool;
+}
 
 // Colors of things
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
@@ -79,8 +85,8 @@ $(document).ready(function documentReady ()
     });
 
     exportButton.on('mousedown', exportJSON);
-    moveButton.on('mousedown', function() {currentTool = handTool;} );
-    editButton.on('mousedown', function() {currentTool = polygonTool;});
+    moveButton.on('mousedown', function() {selectedTool = handTool;} );
+    editButton.on('mousedown', function() {selectedTool = polygonTool;});
 });
 
 function loadImage(file)
@@ -292,11 +298,11 @@ function manageCursor()
     {
         document.body.style.cursor = "auto";
     }
-    else if( currentTool == polygonTool )
+    else if( currentTool() == polygonTool )
     {
         document.body.style.cursor = "crosshair";
     }
-    else if( currentTool == handTool )
+    else if( currentTool() == handTool )
     {
         document.body.style.cursor = "hand";
     }
@@ -327,10 +333,10 @@ function mouseDown(event)
 
         if( event.button == 1 )
         {
-            // currentTool = handTool;
+            tempTool = handTool;
         }
 
-        currentTool.mouseDown({
+        currentTool().mouseDown({
             polyTraceDocument : polyTraceDocument,
             worldLocation : canvasToWorld(v),
             event : event,
@@ -347,7 +353,7 @@ function doubleClick()
 {
     if( APP_STATE == 'mode' )
     {
-        currentTool.doubleClick({
+        currentTool().doubleClick({
             polyTraceDocument : polyTraceDocument,
             event : event});
     }
@@ -385,7 +391,7 @@ function mouseMove(event)
 {
     var v = [event.offsetX, event.offsetY];
 
-    currentTool.mouseMove({
+    currentTool().mouseMove({
         polyTraceDocument : polyTraceDocument,
         worldLocation : canvasToWorld(v),
         event : event});
@@ -397,11 +403,12 @@ function mouseUp(event)
 {
     var v = [event.offsetX, event.offsetY];
 
-    currentTool.mouseUp({
+    currentTool().mouseUp({
         polyTraceDocument : polyTraceDocument,
         worldLocation : canvasToWorld(v),
         event : event});
 
+    tempTool = null;
     drawScreen();
 }
 
