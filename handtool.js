@@ -34,3 +34,8 @@ HandTool.prototype.mouseUp = function(eventInfo)
     this.dragDown = null;
 }
 
+HandTool.prototype.manageCursor = function()
+{
+    document.body.style.cursor = "hand";
+}
+

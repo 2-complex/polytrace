@@ -20,6 +20,7 @@ var cellSize = 100;
 var polyTraceDocument = new PolyTraceDocument();
 var polygonTool = new PolygonTool();
 var handTool = new HandTool();
+var editTool = new EditTool();
 
 var selectedTool = polygonTool;
 var tempTool = null;
@@ -38,7 +39,9 @@ $(document).ready(function documentReady ()
     body = $('body');
     canvas = $("#canvas");
     exportButton = $('button.export');
-    moveButton = $('button.move');
+
+    polyButton = $('button.poly');
+    handButton = $('button.hand');
     editButton = $('button.edit');
 
     window.onkeydown = keyDown;
@@ -85,8 +88,10 @@ $(document).ready(function documentReady ()
     });
 
     exportButton.on('mousedown', exportJSON);
-    moveButton.on('mousedown', function() {selectedTool = handTool;} );
-    editButton.on('mousedown', function() {selectedTool = polygonTool;});
+
+    polyButton.on('mousedown', function() {selectedTool = polygonTool;} );
+    handButton.on('mousedown', function() {selectedTool = handTool;});
+    editButton.on('mousedown', function() {selectedTool = editTool;} );
 });
 
 function loadImage(file)
@@ -294,20 +299,15 @@ function drawScreen()
 
 function manageCursor()
 {
+    var tool = currentTool();
+
     if( APP_STATE == 'title' )
     {
         document.body.style.cursor = "auto";
     }
-    else if( currentTool() == polygonTool )
+    else if( tool )
     {
-        document.body.style.cursor = "crosshair";
-    }
-    else if( currentTool() == handTool )
-    {
-        document.body.style.cursor = "hand";
-    }
-    else if( APP_STATE == 'end' )
-    {
+        tool.manageCursor();
     }
 }
 

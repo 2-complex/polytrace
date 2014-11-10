@@ -29,3 +29,7 @@ PolygonTool.prototype.mouseUp = function(eventInfo)
 {
 }
 
+PolygonTool.prototype.manageCursor = function()
+{
+    document.body.style.cursor = "crosshair";
+}
