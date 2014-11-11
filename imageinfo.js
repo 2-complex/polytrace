@@ -10,7 +10,7 @@ ImageInfo.prototype.draw = function(ctx, convert)
     var pc = convert(this.position);
     var pd = convert([
         this.position[0] + this.img.width,
-        this.position[0] + this.img.height]);
+        this.position[1] + this.img.height]);
 
     ctx.drawImage(this.img, pc[0], pc[1], pd[0] - pc[0], pd[1] - pc[1]);
 }

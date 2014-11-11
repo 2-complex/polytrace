@@ -1,9 +1,11 @@
 
-function Polygon()
+Polygon = function()
 {
     this.vertices = [];
     this.closed = false;
 }
+
+Polygon.HANDLE_RADIUS = 4;
 
 Polygon.prototype.draw = function(ctx, convert)
 {
@@ -13,8 +15,8 @@ Polygon.prototype.draw = function(ctx, convert)
 
         var x = v[0]
         var y = v[1];
-        var w = 4;
-        var h = 4;
+        var w = Polygon.HANDLE_RADIUS;
+        var h = Polygon.HANDLE_RADIUS;
         ctx.fillStyle = polygonStrokeColor;
         ctx.strokeStyle = polygonStrokeColor;
         ctx.strokeRect(x-w, y-w, 2*w, 2*h);

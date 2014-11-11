@@ -18,24 +18,42 @@ EditTool.prototype.mouseDown = function(eventInfo)
         {
             var p = l[j];
 
-            var screenP = canvasToWorld(p);
+            var screenP = worldToCanvas(p);
             var dx = screenloc[0] - screenP[0];
             var dy = screenloc[1] - screenP[1];
 
-            if( dx < 3 && dx > -3 &&
-                dy < 3 && dy > -3 )
+            if( dx < Polygon.HANDLE_RADIUS && dx > -Polygon.HANDLE_RADIUS &&
+                dy < Polygon.HANDLE_RADIUS && dy > -Polygon.HANDLE_RADIUS )
             {
                 this.dragDown = p;
             }
         }
     }
+/*
+    if( ! this.dragDown )
+    {
+        var list = [];
+        for ( var i = 0; i < eventInfo.polyTraceDocument.images.length; i++ )
+        {
+            var imageInfo = eventInfo.polyTraceDocument.images;
+
+            if ( screenloc[0] - cornerA[0] > 0 &&
+                 screenloc[1] - cornerA[1] > 0 &&
+
+
+            var cornerA = canvasToWorld([
+                imageInfo.position[0] + imageInfo.img.width,
+                imageInfo.position[1] + imageInfo.img.height]);
+        }
+    }
+    */
 }
 
 EditTool.prototype.mouseMove = function(eventInfo)
 {
     if( this.dragDown )
     {
-        var v = [event.offsetX, event.offsetY];
+        var v = canvasToWorld([event.offsetX, event.offsetY]);
         this.dragDown[0] = this.dragDiff[0] + v[0];
         this.dragDown[1] = this.dragDiff[1] + v[1];
     }
@@ -49,7 +67,7 @@ EditTool.prototype.mouseUp = function(eventInfo)
 {
     if( this.dragDown )
     {
-        var v = [event.offsetX, event.offsetY];
+        var v = canvasToWorld([event.offsetX, event.offsetY]);
         this.dragDown[0] = this.dragDiff[0] + v[0];
         this.dragDown[1] = this.dragDiff[1] + v[1];
         this.dragDown = null;

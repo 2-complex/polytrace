@@ -11,7 +11,20 @@ PolygonTool.prototype.mouseDown = function(eventInfo)
         this.currentPolygon = new Polygon();
         eventInfo.polyTraceDocument.polygons.push(this.currentPolygon);
     }
-    this.currentPolygon.vertices.push(eventInfo.worldLocation);
+
+    if( this.currentPolygon.vertices.length > 0 )
+    {
+        var lastp = this.currentPolygon.vertices[this.currentPolygon.vertices.length - 1];
+        if( ! (eventInfo.worldLocation[0] == lastp[0] &&
+               eventInfo.worldLocation[1] == lastp[1] ) )
+        {
+            this.currentPolygon.vertices.push(eventInfo.worldLocation);
+        }
+    }
+    else
+    {
+        this.currentPolygon.vertices.push(eventInfo.worldLocation);
+    }
 }
 
 PolygonTool.prototype.mouseMove = function(eventInfo)
