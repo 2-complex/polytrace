@@ -9,7 +9,8 @@ HandTool.prototype.mouseDown = function(eventInfo)
 {
     var v = [event.offsetX, event.offsetY];
     this.dragDown = eventInfo.offset;
-    this.dragDiff = [eventInfo.offset[0] - v[0], eventInfo.offset[1] - v[1]];
+    this.dragDiff[0] = eventInfo.offset[0] - v[0]
+    this.dragDiff[1] = eventInfo.offset[1] - v[1];
 }
 
 HandTool.prototype.mouseMove = function(eventInfo)

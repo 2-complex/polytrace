@@ -16,37 +16,49 @@ EditTool.prototype.mouseDown = function(eventInfo)
 
         for ( var j = 0; j < l.length; j++ )
         {
-            var p = l[j];
+            var screenP = worldToCanvas(l[j]);
 
-            var screenP = worldToCanvas(p);
             var dx = screenloc[0] - screenP[0];
             var dy = screenloc[1] - screenP[1];
 
             if( dx < Polygon.HANDLE_RADIUS && dx > -Polygon.HANDLE_RADIUS &&
                 dy < Polygon.HANDLE_RADIUS && dy > -Polygon.HANDLE_RADIUS )
             {
-                this.dragDown = p;
+                this.dragDown = l[j];
             }
         }
     }
-/*
+
     if( ! this.dragDown )
     {
+        var canvasLoc = canvasToWorld(screenloc);
         var list = [];
         for ( var i = 0; i < eventInfo.polyTraceDocument.images.length; i++ )
         {
-            var imageInfo = eventInfo.polyTraceDocument.images;
+            var imageInfo = eventInfo.polyTraceDocument.images[i];
 
-            if ( screenloc[0] - cornerA[0] > 0 &&
-                 screenloc[1] - cornerA[1] > 0 &&
-
-
-            var cornerA = canvasToWorld([
+            var cornerA = imageInfo.position;
+            var cornerB = [
                 imageInfo.position[0] + imageInfo.img.width,
-                imageInfo.position[1] + imageInfo.img.height]);
+                imageInfo.position[1] + imageInfo.img.height];
+
+            if ( canvasLoc[0] - cornerA[0] > 0 &&
+                 canvasLoc[1] - cornerA[1] > 0 &&
+                 canvasLoc[0] - cornerB[0] < 0 &&
+                 canvasLoc[1] - cornerB[1] < 0 )
+            {
+                var v = canvasToWorld([event.offsetX, event.offsetY]);
+                this.dragDown = imageInfo.position;
+            }
         }
     }
-    */
+
+    if( this.dragDown )
+    {
+        var v = canvasToWorld([event.offsetX, event.offsetY]);
+        this.dragDiff[0] = this.dragDown[0] - v[0];
+        this.dragDiff[1] = this.dragDown[1] - v[1];
+    }
 }
 
 EditTool.prototype.mouseMove = function(eventInfo)
