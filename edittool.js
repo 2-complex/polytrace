@@ -34,23 +34,13 @@ EditTool.prototype.mouseDown = function(eventInfo)
 
     if( ! this.draggable )
     {
-        var canvasLoc = canvasToWorld(screenloc);
         var list = [];
         for ( var i = 0; i < eventInfo.polyTraceDocument.images.length; i++ )
         {
             var imageInfo = eventInfo.polyTraceDocument.images[i];
 
-            var cornerA = imageInfo.position;
-            var cornerB = [
-                imageInfo.position[0] + imageInfo.img.width,
-                imageInfo.position[1] + imageInfo.img.height];
-
-            if ( canvasLoc[0] - cornerA[0] > 0 &&
-                 canvasLoc[1] - cornerA[1] > 0 &&
-                 canvasLoc[0] - cornerB[0] < 0 &&
-                 canvasLoc[1] - cornerB[1] < 0 )
+            if( imageInfo.clickIn(screenloc) )
             {
-                var v = canvasToWorld([event.offsetX, event.offsetY]);
                 this.draggable = imageInfo;
             }
         }

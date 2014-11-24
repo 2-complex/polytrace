@@ -9,6 +9,21 @@ function ImageInfo(img, position)
 
 ImageInfo.prototype = inherit([Draggable]);
 
+ImageInfo.prototype.clickIn = function(screenloc)
+{
+    var canvasLoc = canvasToWorld(screenloc);
+
+    var cornerA = this.position;
+    var cornerB = [
+        this.position[0] + this.img.width,
+        this.position[1] + this.img.height];
+
+    return canvasLoc[0] - cornerA[0] > 0 &&
+           canvasLoc[1] - cornerA[1] > 0 &&
+           canvasLoc[0] - cornerB[0] < 0 &&
+           canvasLoc[1] - cornerB[1] < 0;
+}
+
 ImageInfo.prototype.draw = function(ctx, convert)
 {
     var pc = convert(this.position);
