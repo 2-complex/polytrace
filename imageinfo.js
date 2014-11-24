@@ -1,9 +1,13 @@
 
 function ImageInfo(img, position)
 {
+    Draggable.call(this);
+
     this.img = img;
     this.position = [position[0], position[1]];
 }
+
+ImageInfo.prototype = inherit([Draggable]);
 
 ImageInfo.prototype.draw = function(ctx, convert)
 {

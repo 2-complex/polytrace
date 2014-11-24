@@ -46,3 +46,4 @@ PolygonTool.prototype.manageCursor = function()
 {
     document.body.style.cursor = "crosshair";
 }
+
