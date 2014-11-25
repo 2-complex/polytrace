@@ -29,10 +29,13 @@ HandTool.prototype.doubleClick = function(eventInfo)
 
 HandTool.prototype.mouseUp = function(eventInfo)
 {
-    var v = [event.offsetX, event.offsetY];
-    this.dragDown[0] = this.dragDiff[0] + v[0];
-    this.dragDown[1] = this.dragDiff[1] + v[1];
-    this.dragDown = null;
+    if( this.dragDown )
+    {
+        var v = [event.offsetX, event.offsetY];
+        this.dragDown[0] = this.dragDiff[0] + v[0];
+        this.dragDown[1] = this.dragDiff[1] + v[1];
+        this.dragDown = null;
+    }
 }
 
 HandTool.prototype.manageCursor = function()

@@ -2,10 +2,9 @@
 Polygon = function()
 {
     this.vertices = [];
+    this.handles = [];
     this.closed = false;
 }
-
-Polygon.HANDLE_RADIUS = 4;
 
 Polygon.prototype.draw = function(ctx, convert)
 {
@@ -15,8 +14,8 @@ Polygon.prototype.draw = function(ctx, convert)
 
         var x = v[0]
         var y = v[1];
-        var w = Polygon.HANDLE_RADIUS;
-        var h = Polygon.HANDLE_RADIUS;
+        var w = Handle.HANDLE_RADIUS;
+        var h = Handle.HANDLE_RADIUS;
         ctx.fillStyle = polygonStrokeColor;
         ctx.strokeStyle = polygonStrokeColor;
         ctx.strokeRect(x-w, y-w, 2*w, 2*h);
@@ -46,6 +45,13 @@ Polygon.prototype.draw = function(ctx, convert)
 
         ctx.stroke();
     }
+}
+
+Polygon.prototype.add = function(newVertex)
+{
+    var newVertexCopy = [newVertex[0], newVertex[1]];
+    this.vertices.push(newVertexCopy);
+    this.handles.push(new Handle(newVertexCopy));
 }
 
 Polygon.prototype.close = function()

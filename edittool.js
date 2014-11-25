@@ -13,21 +13,15 @@ EditTool.prototype.mouseDown = function(eventInfo)
     var screenloc = [event.offsetX, event.offsetY];
 
     var list = [];
-    for ( var i = 0; i < eventInfo.polyTraceDocument.polygons.length; i++ )
+    for( var i = 0; i < eventInfo.polyTraceDocument.polygons.length; i++ )
     {
-        var l = eventInfo.polyTraceDocument.polygons[i].vertices;
+        var l = eventInfo.polyTraceDocument.polygons[i].handles;
 
-        for ( var j = 0; j < l.length; j++ )
+        for( var j = 0; j < l.length; j++ )
         {
-            var screenP = worldToCanvas(l[j]);
-
-            var dx = screenloc[0] - screenP[0];
-            var dy = screenloc[1] - screenP[1];
-
-            if( dx < Polygon.HANDLE_RADIUS && dx > -Polygon.HANDLE_RADIUS &&
-                dy < Polygon.HANDLE_RADIUS && dy > -Polygon.HANDLE_RADIUS )
+            if( l[j].clickIn(screenloc) )
             {
-                this.dragDown = l[j];
+                this.dragDown = l[j].position;
             }
         }
     }

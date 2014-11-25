@@ -18,12 +18,12 @@ PolygonTool.prototype.mouseDown = function(eventInfo)
         if( ! (eventInfo.worldLocation[0] == lastp[0] &&
                eventInfo.worldLocation[1] == lastp[1] ) )
         {
-            this.currentPolygon.vertices.push(eventInfo.worldLocation);
+            this.currentPolygon.add(eventInfo.worldLocation);
         }
     }
     else
     {
-        this.currentPolygon.vertices.push(eventInfo.worldLocation);
+        this.currentPolygon.add(eventInfo.worldLocation);
     }
 }
 

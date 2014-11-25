@@ -11,7 +11,7 @@ ImageInfo.prototype = inherit([Draggable]);
 
 ImageInfo.prototype.clickIn = function(screenloc)
 {
-    var canvasLoc = canvasToWorld(screenloc);
+    var canvasLoc = canvasToWorld(screenloc); // WAT?
 
     var cornerA = this.position;
     var cornerB = [

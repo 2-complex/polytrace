@@ -35,3 +35,4 @@ Draggable.prototype.drag = function(event)
     this.position[0] = this.dragDiff[0] + v[0];
     this.position[1] = this.dragDiff[1] + v[1];
 }
+
