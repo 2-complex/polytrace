@@ -8,23 +8,9 @@ Polygon = function()
 
 Polygon.prototype.draw = function(ctx, convert)
 {
-    for ( var i=0; i<this.vertices.length; i++ )
-    {
-        var v = convert(this.vertices[i]);
-
-        var x = v[0]
-        var y = v[1];
-        var w = Handle.HANDLE_RADIUS;
-        var h = Handle.HANDLE_RADIUS;
-        ctx.fillStyle = polygonStrokeColor;
-        ctx.strokeStyle = polygonStrokeColor;
-        ctx.strokeRect(x-w, y-w, 2*w, 2*h);
-    }
-
     if( this.vertices.length > 0 )
     {
         ctx.beginPath();
-
         ctx.lineWidth = 2;
         ctx.strokeStyle = polygonStrokeColor;
 
@@ -44,6 +30,11 @@ Polygon.prototype.draw = function(ctx, convert)
         }
 
         ctx.stroke();
+    }
+
+    for ( var i=0; i<this.vertices.length; i++ )
+    {
+        this.handles[i].draw(ctx, convert);
     }
 }
 
