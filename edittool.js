@@ -11,32 +11,32 @@ EditTool.prototype.mouseDown = function(eventInfo)
 
     var screenloc = [event.offsetX, event.offsetY];
 
-    var list = [];
+    var draggableList = [];
 
     for( var i = 0; i < eventInfo.polyTraceDocument.polygons.length; i++ )
     {
         var l = eventInfo.polyTraceDocument.polygons[i].handles;
-
         for( var j = 0; j < l.length; j++ )
         {
-            if( l[j].clickIn(screenloc) )
-            {
-                this.draggable = l[j];
-            }
+            draggableList.push( l[j] );
         }
     }
 
     if( ! this.draggable )
     {
-        var list = [];
         for ( var i = 0; i < eventInfo.polyTraceDocument.images.length; i++ )
         {
             var imageInfo = eventInfo.polyTraceDocument.images[i];
+            draggableList.push( imageInfo );
+        }
+    }
 
-            if( imageInfo.clickIn(screenloc) )
-            {
-                this.draggable = imageInfo;
-            }
+    for( var i = 0; i < draggableList.length; i++ )
+    {
+        if( draggableList[i].clickIn(screenloc) )
+        {
+            this.draggable = draggableList[i];
+            break;
         }
     }
 
@@ -58,7 +58,6 @@ EditTool.prototype.mouseMove = function(eventInfo)
 
 EditTool.prototype.doubleClick = function(eventInfo)
 {
-    var event = eventInfo.event;
 }
 
 EditTool.prototype.mouseUp = function(eventInfo)
