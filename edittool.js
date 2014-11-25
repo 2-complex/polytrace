@@ -1,7 +1,6 @@
 
 function EditTool(traceDocument)
 {
-    this.dragDown = null;
     this.draggable = null;
     this.dragDiff = [0,0];
 }
@@ -13,6 +12,7 @@ EditTool.prototype.mouseDown = function(eventInfo)
     var screenloc = [event.offsetX, event.offsetY];
 
     var list = [];
+
     for( var i = 0; i < eventInfo.polyTraceDocument.polygons.length; i++ )
     {
         var l = eventInfo.polyTraceDocument.polygons[i].handles;
@@ -21,7 +21,7 @@ EditTool.prototype.mouseDown = function(eventInfo)
         {
             if( l[j].clickIn(screenloc) )
             {
-                this.dragDown = l[j].position;
+                this.draggable = l[j];
             }
         }
     }
@@ -40,13 +40,6 @@ EditTool.prototype.mouseDown = function(eventInfo)
         }
     }
 
-    if( this.dragDown )
-    {
-        var v = canvasToWorld([event.offsetX, event.offsetY]);
-        this.dragDiff[0] = this.dragDown[0] - v[0];
-        this.dragDiff[1] = this.dragDown[1] - v[1];
-    }
-
     if( this.draggable )
     {
         this.draggable.startDrag(event);
@@ -56,13 +49,6 @@ EditTool.prototype.mouseDown = function(eventInfo)
 EditTool.prototype.mouseMove = function(eventInfo)
 {
     var event = eventInfo.event;
-
-    if( this.dragDown )
-    {
-        var v = canvasToWorld([event.offsetX, event.offsetY]);
-        this.dragDown[0] = this.dragDiff[0] + v[0];
-        this.dragDown[1] = this.dragDiff[1] + v[1];
-    }
 
     if( this.draggable )
     {
@@ -78,14 +64,6 @@ EditTool.prototype.doubleClick = function(eventInfo)
 EditTool.prototype.mouseUp = function(eventInfo)
 {
     var event = eventInfo.event;
-
-    if( this.dragDown )
-    {
-        var v = canvasToWorld([event.offsetX, event.offsetY]);
-        this.dragDown[0] = this.dragDiff[0] + v[0];
-        this.dragDown[1] = this.dragDiff[1] + v[1];
-        this.dragDown = null;
-    }
 
     if( this.draggable )
     {
