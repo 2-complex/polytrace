@@ -15,21 +15,10 @@ EditTool.prototype.mouseDown = function(eventInfo)
 
     for( var i = 0; i < eventInfo.polyTraceDocument.polygons.length; i++ )
     {
-        var l = eventInfo.polyTraceDocument.polygons[i].handles;
-        for( var j = 0; j < l.length; j++ )
-        {
-            draggableList.push( l[j] );
-        }
+        draggableList = draggableList.concat(eventInfo.polyTraceDocument.polygons[i].handles);
     }
 
-    if( ! this.draggable )
-    {
-        for ( var i = 0; i < eventInfo.polyTraceDocument.images.length; i++ )
-        {
-            var imageInfo = eventInfo.polyTraceDocument.images[i];
-            draggableList.push( imageInfo );
-        }
-    }
+    draggableList = draggableList.concat( eventInfo.polyTraceDocument.images );
 
     for( var i = 0; i < draggableList.length; i++ )
     {
