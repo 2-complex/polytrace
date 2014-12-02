@@ -113,7 +113,9 @@ function loadImage(file)
         var img = new Image();
         img.onload = function()
         {
-            polyTraceDocument.images.push(new ImageInfo(img, [100,100]));
+            var newImageInfo = new ImageInfo(img, [100,100]);
+            polyTraceDocument.addImage(newImageInfo);
+            undoManager.push(polyTraceDocument.removeImage, polyTraceDocument, [newImageInfo]);
             drawScreen();
         }
         img.src = source; // triggers the load

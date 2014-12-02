@@ -18,4 +18,3 @@ UndoManager.prototype.push = function(undoFunction, theThis, argList)
     this.undoList.push({undoFunction:undoFunction, theThis:theThis, argList:argList});
 }
 
-
