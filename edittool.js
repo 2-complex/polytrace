@@ -55,7 +55,7 @@ EditTool.prototype.mouseUp = function(eventInfo)
 
     if( this.draggable )
     {
-        this.draggable.drag(event);
+        this.draggable.finishDrag(event);
         this.draggable = null;
     }
 }

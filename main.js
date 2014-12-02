@@ -4,6 +4,7 @@ var ctx;
 var exportButton;
 var moveButton;
 var editButton;
+var undoButton;
 var exportWindow = null;
 
 var lastEvent;
@@ -25,6 +26,9 @@ var editTool = new EditTool();
 var selectedTool = polygonTool;
 var tempTool = null;
 
+var undoManager = new UndoManager();
+
+
 function currentTool()
 {
     return tempTool || selectedTool;
@@ -43,6 +47,7 @@ $(document).ready(function documentReady ()
     polyButton = $('button.poly');
     handButton = $('button.hand');
     editButton = $('button.edit');
+    undoButton = $('button.undo');
 
     window.onkeydown = keyDown;
     window.onkeyup = keyUp;
@@ -92,6 +97,8 @@ $(document).ready(function documentReady ()
     polyButton.on('mousedown', function() {selectedTool = polygonTool;} );
     handButton.on('mousedown', function() {selectedTool = handTool;});
     editButton.on('mousedown', function() {selectedTool = editTool;} );
+
+    undoButton.on('mousedown', function() {undoManager.pop(); drawScreen();});
 });
 
 function loadImage(file)
@@ -100,9 +107,9 @@ function loadImage(file)
 
     reader.readAsDataURL(file);
 
-    reader.onloadend = function(){
+    reader.onloadend = function()
+    {
         var source = this.result;
-
         var img = new Image();
         img.onload = function()
         {
