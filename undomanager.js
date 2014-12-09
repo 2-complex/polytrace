@@ -1,20 +1,39 @@
 
 function UndoManager()
 {
+    this.head = -1;
     this.undoList = [];
 }
 
-UndoManager.prototype.pop = function()
+UndoManager.prototype.undo = function()
 {
-    if ( this.undoList.length > 0 )
+    if( this.head >= 0 )
     {
-        var l = this.undoList.pop();
-        l.undoFunction.apply(l.theThis, l.argList);
+        var info = this.undoList[this.head];
+        info.undoFunction.apply(info.undoThis, info.undoArgList);
+        this.head--;
     }
 }
 
-UndoManager.prototype.push = function(undoFunction, theThis, argList)
+UndoManager.prototype.redo = function()
 {
-    this.undoList.push({undoFunction:undoFunction, theThis:theThis, argList:argList});
+    if( this.head < this.undoList.length - 1 )
+    {
+        this.head++;
+        var info = this.undoList[this.head];
+        info.redoFunction.apply(info.redoThis, info.redoArgList);
+    }
+}
+
+UndoManager.prototype.push = function(undoFunction, undoThis, undoArgList, redoFunction, redoThis, redoArgList)
+{
+    if( this.head < this.undoList.length - 1 )
+    {
+        this.undoList = this.undoList.slice(0, this.head + 1);
+    }
+    this.undoList.push({
+        undoFunction:undoFunction, undoThis:undoThis, undoArgList:undoArgList,
+        redoFunction:redoFunction, redoThis:redoThis, redoArgList:redoArgList});
+    this.head++;
 }
 

@@ -5,6 +5,7 @@ var exportButton;
 var moveButton;
 var editButton;
 var undoButton;
+var redoButton;
 var exportWindow = null;
 
 var lastEvent;
@@ -48,6 +49,7 @@ $(document).ready(function documentReady ()
     handButton = $('button.hand');
     editButton = $('button.edit');
     undoButton = $('button.undo');
+    redoButton = $('button.redo');
 
     window.onkeydown = keyDown;
     window.onkeyup = keyUp;
@@ -98,7 +100,8 @@ $(document).ready(function documentReady ()
     handButton.on('mousedown', function() {selectedTool = handTool;});
     editButton.on('mousedown', function() {selectedTool = editTool;} );
 
-    undoButton.on('mousedown', function() {undoManager.pop(); drawScreen();});
+    undoButton.on('mousedown', function() {undoManager.undo(); drawScreen();});
+    redoButton.on('mousedown', function() {undoManager.redo(); drawScreen();});
 });
 
 function loadImage(file)
@@ -115,7 +118,9 @@ function loadImage(file)
         {
             var newImageInfo = new ImageInfo(img, [100,100]);
             polyTraceDocument.addImage(newImageInfo);
-            undoManager.push(polyTraceDocument.removeImage, polyTraceDocument, [newImageInfo]);
+            undoManager.push(
+                polyTraceDocument.removeImage, polyTraceDocument, [newImageInfo],
+                polyTraceDocument.addImage, polyTraceDocument, [newImageInfo]);
             drawScreen();
         }
         img.src = source; // triggers the load

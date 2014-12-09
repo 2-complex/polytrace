@@ -10,7 +10,9 @@ PolygonTool.prototype.mouseDown = function(eventInfo)
     {
         this.currentPolygon = new Polygon();
         eventInfo.polyTraceDocument.addPolygon(this.currentPolygon);
-        undoManager.push(eventInfo.polyTraceDocument.removePolygon, eventInfo.polyTraceDocument, [this.currentPolygon]);
+        undoManager.push(
+            eventInfo.polyTraceDocument.removePolygon, eventInfo.polyTraceDocument, [this.currentPolygon],
+            eventInfo.polyTraceDocument.addPolygon, eventInfo.polyTraceDocument, [this.currentPolygon]);
     }
 
     if( this.currentPolygon.vertices.length > 0 )

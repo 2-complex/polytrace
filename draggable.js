@@ -49,6 +49,7 @@ Draggable.prototype.finishDrag = function(event)
     this.drag(event);
 
     undoManager.push(
-        Draggable.prototype.setPosition, this, this.startingPosition);
+        Draggable.prototype.setPosition, this, this.startingPosition,
+        Draggable.prototype.setPosition, this, [this.position[0], this.position[1]]);
 }
 
