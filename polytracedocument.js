@@ -13,6 +13,12 @@ PolyTraceDocument.prototype.close = function()
 {
 }
 
+PolyTraceDocument.prototype.serialize = function()
+{
+    return JSON.stringify( {'polygons' : this.polygons, 'images' : []} );
+}
+
+
 PolyTraceDocument.prototype.addImage = function(imageInfo)
 {
     this.images.push(imageInfo);
