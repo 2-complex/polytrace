@@ -19,7 +19,7 @@ div.toolbar {
     left: 0px;
     right: 0px;
     text-align: left;
-    height: 32px;
+    height: 64px;
     padding: 4px;
 
     -webkit-user-select: none;
@@ -30,12 +30,19 @@ div.toolbar {
 }
 
 button {
-    height: 24px;
+    font-size: 1.2em;
+    padding: 0px 12px;
+    margin: 6px 6px;
+    height: 44px;
     background: none;
     border: 1px solid #FFF;
     color: #FFF;
     border-radius: 3px;
     outline-width: 0;
+}
+
+button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 button:active,
