@@ -29,6 +29,10 @@ div.toolbar {
     user-select: none;
 }
 
+div.export textarea {
+    width: 72%;
+}
+
 button {
     font-size: 1.2em;
     padding: 0px 12px;
