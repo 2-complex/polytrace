@@ -8,7 +8,6 @@ var undoButton;
 var redoButton;
 var exportWindow = null;
 
-var lastEvent;
 var heldKeys = {};
 
 var offset = [0, 0];
@@ -420,20 +419,12 @@ function mouseUp(event)
     drawScreen();
 }
 
-function keyDown(event)
+function keyDown(theEvent)
 {
-    if (lastEvent && lastEvent.which == event.which)
-    {
-        return;
-    }
+    var result = true;
 
-    switch( event.which )
+    switch( theEvent.which )
     {
-        case 16: // shift
-        case 17: // ctrl
-        case 18: // alt
-        return;
-
         case 187: // =
             scaleFactor *= 1.1;
         break;
@@ -444,47 +435,48 @@ function keyDown(event)
 
         case 37: // left
             offset[0] -= 30;
-            break;
+        break;
+
         case 38: // up
             offset[1] -= 30;
-            break;
+        break;
+
         case 39: // right
             offset[0] += 30;
-            break;
+        break;
+
         case 40: // down
             offset[1] += 30;
-            break;
+        break;
     }
 
-    lastEvent = event;
-    heldKeys[event.which] = true;
+    var isMetaDown = (heldKeys[91] > 0 || heldKeys[93] > 0);
+    var isShiftDown = (heldKeys[16] > 0);
+
+    console.dir(theEvent);
+
+    if (isMetaDown && theEvent.which === 90)
+    {
+        undoManager.undo();
+        theEvent.stopPropagation();
+        result = false;
+    }
+
+    if (isMetaDown && isShiftDown && theEvent.which === 90) {
+        undoManager.redo();
+        theEvent.stopPropagation();
+        result = false;
+    }
+
+    heldKeys[theEvent.which] = (heldKeys[theEvent.which]++) || 1;
 
     drawScreen();
+
+    return result;
 }
 
 function keyUp()
 {
-    lastEvent = null;
-
-    if (lastEvent && lastEvent.which == event.which)
-    {
-        return;
-    }
-
-    // These will probably be useful later.
-    switch( event.which )
-    {
-        case 16: // shift
-        case 17: // ctrl
-        case 18: // alt
-        case 37: // left
-        case 38: // up
-        case 39: // right
-        case 40: // down
-        case 32: // space
-            return;
-    }
-
-    delete(heldKeys[event.keyCode]); // Why is this keyCode and not which?
+    heldKeys[event.which]--;
 }
 
