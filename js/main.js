@@ -38,10 +38,10 @@ function currentTool()
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
 var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 
-$(document).ready(function documentReady ()
+$(document).ready(function ()
 {
     body = $('body');
-    canvas = $("#canvas");
+    canvas = $('#canvas');
     exportButton = $('button.export');
 
     polyButton = $('button.poly');
@@ -50,16 +50,19 @@ $(document).ready(function documentReady ()
     undoButton = $('button.undo');
     redoButton = $('button.redo');
 
-    window.onkeydown = keyDown;
-    window.onkeyup = keyUp;
-
     canvas.on("mousedown", mouseDown);
     canvas.on("mouseup", mouseUp);
     canvas.on("mousemove", mouseMove);
     canvas.on("dblclick", doubleClick);
     canvas.on("mousewheel", mouseWheel);
+    // Redraw screen for these events
+    canvas.on("mousedown mouseup mousemove dblclick mousewheel", drawScreen);
 
     $(window).on("resize", resize);
+    $(window).on("keydown", keyDown);
+    $(window).on("keyup", keyUp);
+    // Redraw screen for these events
+    $(window).on("resize keydown keyup", drawScreen);
 
     if( canvas[0].getContext )
     {
@@ -75,11 +78,13 @@ $(document).ready(function documentReady ()
     canvas.on('dragover', function(e){
         e.stopPropagation();
         e.preventDefault();
+        return false;
     });
 
     canvas.on('dragenter', function(e){
         e.stopPropagation();
         e.preventDefault();
+        return false;
     });
 
     canvas.on('drop', function(e){
@@ -89,6 +94,8 @@ $(document).ready(function documentReady ()
                 e.stopPropagation();
 
                 loadImage(e.originalEvent.dataTransfer.files[0]);
+
+                return false;
             }
         }
     });
@@ -115,7 +122,7 @@ function loadImage(file)
         var img = new Image();
         img.onload = function()
         {
-            var newImageInfo = new ImageInfo(img, [100,100]);
+            var newImageInfo = new ImageInfo(img, [100, 100]);
             polyTraceDocument.addImage(newImageInfo);
             undoManager.push(
                 polyTraceDocument.removeImage, polyTraceDocument, [newImageInfo],
@@ -172,29 +179,30 @@ function titleScreenLoop(t)
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = "80px Arial";
-    ctx.translate(canvas.width()/2, canvas.height()/2);
+    ctx.translate(canvas.width() / 2, canvas.height() / 2);
 
     ctx.save();
     var w = 200;
     var h = 100;
     ctx.fillStyle = "#00f";
-    ctx.fillRect(-w, -h, 2*w, 2*h);
+    ctx.fillRect(-w, -h, 2 * w, 2 * h);
     ctx.restore();
 
     ctx.save();
     ctx.fillStyle = "#000";
     ctx.translate(0, 35);
-    ctx.fillText("TRACE", 0,0);
+    ctx.fillText("TRACE", 0, 0);
     ctx.restore();
 
     ctx.save();
     ctx.fillStyle = "#0ef";
     ctx.translate(0, -35);
-    ctx.fillText("POLY", 0,0);
+    ctx.fillText("POLY", 0, 0);
     ctx.restore();
 
     ctx.fillStyle = "#555";
-    ctx.font = (20*Math.atan(Math.PI*t/1000)+40)+"px Arial";
+    var fontSizeBasedOnTime = (20 * Math.atan(Math.PI * t / 1000) + 40);
+    ctx.font = fontSizeBasedOnTime + "px Arial";
     ctx.fillText("A tool for drawing a polygon path over an image.", 0,200);
 
     ctx.restore();
@@ -281,7 +289,7 @@ function drawGrid()
 
 function drawImages()
 {
-    for ( var i=0; i<polyTraceDocument.images.length; i++ )
+    for( var i = 0; i < polyTraceDocument.images.length; i++ )
     {
         polyTraceDocument.images[i].draw(ctx, worldToCanvas);
     }
@@ -289,7 +297,7 @@ function drawImages()
 
 function drawPolygons()
 {
-    for ( var i=0; i<polyTraceDocument.polygons.length; i++ )
+    for( var i = 0; i < polyTraceDocument.polygons.length; i++ )
     {
         polyTraceDocument.polygons[i].draw(ctx, worldToCanvas);
     }
@@ -322,8 +330,6 @@ function resize(event)
 {
     canvas.attr('width', window.innerWidth);
     canvas.attr('height', window.innerHeight);
-
-    drawScreen();
 }
 
 function mouseDown(event)
@@ -352,8 +358,6 @@ function mouseDown(event)
     else if( APP_STATE == 'end' )
     {
     }
-
-    drawScreen();
 }
 
 function doubleClick()
@@ -364,8 +368,6 @@ function doubleClick()
             polyTraceDocument : polyTraceDocument,
             event : event});
     }
-
-    drawScreen();
 }
 
 function mouseWheel(event)
@@ -390,8 +392,6 @@ function mouseWheel(event)
 
     offset[0] += nudge[0] * scaleFactor;
     offset[1] += nudge[1] * scaleFactor;
-
-    drawScreen();
 }
 
 function mouseMove(event)
@@ -404,8 +404,6 @@ function mouseMove(event)
         event : event
     };
     currentTool().mouseMove(params);
-
-    drawScreen();
 }
 
 function mouseUp(event)
@@ -420,7 +418,6 @@ function mouseUp(event)
     currentTool().mouseUp(params);
 
     tempTool = null;
-    drawScreen();
 }
 
 function keyDown(theEvent)
@@ -472,8 +469,6 @@ function keyDown(theEvent)
     }
 
     heldKeys[theEvent.which] = (heldKeys[theEvent.which]++) || 1;
-
-    drawScreen();
 
     return result;
 }

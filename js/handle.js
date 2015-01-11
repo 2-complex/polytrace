@@ -24,13 +24,13 @@ Handle.prototype.clickIn = function(screenloc)
 Handle.prototype.draw = function(ctx, convert)
 {
     var v = convert(this.position);
-
     var x = v[0]
     var y = v[1];
     var w = Handle.HANDLE_RADIUS;
     var h = Handle.HANDLE_RADIUS;
+
     ctx.fillStyle = polygonStrokeColor;
     ctx.strokeStyle = polygonStrokeColor;
-    ctx.strokeRect(x-w, y-w, 2*w, 2*h);
+    ctx.strokeRect(x - w, y - w, 2 * w, 2 * h);
 }
 
