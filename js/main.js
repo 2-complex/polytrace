@@ -398,10 +398,12 @@ function mouseMove(event)
 {
     var v = [event.offsetX, event.offsetY];
 
-    currentTool().mouseMove({
+    var params = {
         polyTraceDocument : polyTraceDocument,
         worldLocation : canvasToWorld(v),
-        event : event});
+        event : event
+    };
+    currentTool().mouseMove(params);
 
     drawScreen();
 }
@@ -410,10 +412,12 @@ function mouseUp(event)
 {
     var v = [event.offsetX, event.offsetY];
 
-    currentTool().mouseUp({
+    var params = {
         polyTraceDocument : polyTraceDocument,
         worldLocation : canvasToWorld(v),
-        event : event});
+        event : event
+    };
+    currentTool().mouseUp(params);
 
     tempTool = null;
     drawScreen();
@@ -425,44 +429,43 @@ function keyDown(theEvent)
 
     switch( theEvent.which )
     {
-        case 187: // =
+        case KEYS.EQUALS:
             scaleFactor *= 1.1;
         break;
 
-        case 189: // -
+        case KEYS.DASH:
             scaleFactor /= 1.1;
         break;
 
-        case 37: // left
+        case KEYS.LEFT_ARROW:
             offset[0] -= 30;
         break;
 
-        case 38: // up
+        case KEYS.UP_ARROW:
             offset[1] -= 30;
         break;
 
-        case 39: // right
+        case KEYS.RIGHT_ARROW:
             offset[0] += 30;
         break;
 
-        case 40: // down
+        case KEYS.DOWN_ARROW:
             offset[1] += 30;
         break;
     }
 
-    var isMetaDown = (heldKeys[91] > 0 || heldKeys[93] > 0);
-    var isShiftDown = (heldKeys[16] > 0);
+    var isMetaDown = (heldKeys[KEYS.LEFT_META] > 0 || heldKeys[KEYS.RIGHT_META] > 0);
+    var isShiftDown = (heldKeys[KEYS.SHIFT] > 0);
 
-    console.dir(theEvent);
-
-    if (isMetaDown && theEvent.which === 90)
+    if(isMetaDown && theEvent.which === KEYS.KEY_Z) // Command + Z
     {
         undoManager.undo();
         theEvent.stopPropagation();
         result = false;
     }
 
-    if (isMetaDown && isShiftDown && theEvent.which === 90) {
+    if(isMetaDown && isShiftDown && theEvent.which === KEYS.KEY_Z) // Command + Shift + Z
+    { 
         undoManager.redo();
         theEvent.stopPropagation();
         result = false;
