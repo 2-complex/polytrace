@@ -1,4 +1,3 @@
-
 // requestAnimationFrame and cancelAnimationFrame polyfill by Erik MÃ¶ller
 // see: http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
 (function() {
