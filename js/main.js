@@ -249,7 +249,7 @@ function drawGrid()
     ctx.strokeStyle = gridColor;
 
 
-    // draw vertical lines
+    // draw 'vertical' lines
     for( var i = 1; i <= columns; i++ )
     {
         ctx.beginPath();
@@ -263,7 +263,7 @@ function drawGrid()
         ctx.stroke();
     }
 
-    // draw horizontal lines
+    // draw 'horizontal' lines
     for( var i = 1; i <= rows; i++ )
     {
         ctx.beginPath();
