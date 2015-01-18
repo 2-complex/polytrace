@@ -8,9 +8,7 @@ function EditTool(traceDocument)
 EditTool.prototype.mouseDown = function(eventInfo)
 {
     var event = eventInfo.event;
-
     var screenloc = [event.offsetX, event.offsetY];
-
     var draggableList = [];
 
     for( var i = 0; i < eventInfo.polyTraceDocument.polygons.length; i++ )
