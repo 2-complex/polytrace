@@ -245,13 +245,25 @@ function drawLine(p, q)
 
 function drawGrid()
 {
-    var ll = canvasToWorld([0, 0]);
-    var ur = canvasToWorld([canvas.width(), canvas.height()]);
+    var corners = [
+        canvasToWorld([0, 0]),
+        canvasToWorld([0, canvas.height()]),
+        canvasToWorld([canvas.width(), 0]),
+        canvasToWorld([canvas.width(), canvas.height()])
+    ];
 
-    var worldLeft = ll[0];
-    var worldBottom = ll[1];
-    var worldRight = ur[0];
-    var worldTop = ur[1];
+    var worldLeft = corners[0][1];
+    var worldBottom = corners[0][1];
+    var worldRight = corners[0][0];
+    var worldTop = corners[0][1];
+
+    for( var i = 0; i < corners.length; i++ )
+    {
+        worldLeft = Math.min(worldLeft, corners[i][0]);
+        worldRight = Math.max(worldRight, corners[i][0]);
+        worldBottom = Math.min(worldBottom, corners[i][1]);
+        worldTop = Math.max(worldTop, corners[i][1]);
+    }
 
     worldLeft = Math.floor( worldLeft / cellSize ) * cellSize;
     worldRight = (Math.floor( worldRight / cellSize ) + 1) * cellSize;
@@ -435,7 +447,7 @@ function rotate(theta)
 function mouseWheel(event)
 {
     var delta = event.wheelDeltaY;
-    scaleFactor *= Math.pow(1.1, delta / 1000.0);
+    zoom(Math.pow(1.1, delta / 1000.0));
     drawScreen();
 }
 
