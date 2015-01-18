@@ -446,7 +446,7 @@ function rotate(theta)
 
 function mouseWheel(event)
 {
-    var delta = event.wheelDeltaY;
+    var delta = event.originalEvent.wheelDeltaY;
     zoom(Math.pow(1.1, delta / 1000.0));
     drawScreen();
 }
