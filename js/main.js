@@ -13,6 +13,7 @@ var heldKeys = {};
 
 var offset = [0, 0];
 var scaleFactor = 1.0;
+var rotation = 0.0;
 
 var LOOP_ID = null;
 var APP_STATE = null;
@@ -28,6 +29,9 @@ var selectedTool = polygonTool;
 var tempTool = null;
 
 var undoManager = new UndoManager();
+
+var math = o3djs.math;
+var matrix4 = o3djs.math.matrix4;
 
 
 function currentTool()
@@ -202,15 +206,30 @@ function titleScreenLoop(t)
     /***** end draw title text *****/
 }
 
+function getViewMatrix()
+{
+    var c = Math.cos(rotation);
+    var s = Math.sin(rotation);
+    return [
+        [scaleFactor * c, scaleFactor * s, 0, 0],
+        [-scaleFactor * s, scaleFactor * c, 0, 0],
+        [0, 0, 1, 0],
+        [offset[0], offset[1], 0, 1]
+    ];
+}
 
 function worldToCanvas(position)
 {
-    return [scaleFactor * position[0] + offset[0], scaleFactor * position[1] + offset[1]];
+    return matrix4.transformPoint(
+        getViewMatrix(),
+        [position[0], position[1], 0]).slice(0,2);
 }
 
 function canvasToWorld(position)
 {
-    return [(position[0] - offset[0]) / scaleFactor, (position[1] - offset[1]) / scaleFactor];
+    return matrix4.transformPoint(
+        matrix4.inverse(getViewMatrix()),
+        [position[0], position[1], 0]).slice(0,2);
 }
 
 function drawLine(p, q)
@@ -369,13 +388,25 @@ function doubleClick()
     drawScreen();
 }
 
-function mouseWheel(event)
+function preserveCenterDo(modifier, args)
 {
-    var delta = event.originalEvent.wheelDeltaY;
-
     var beforeMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
 
-    scaleFactor *= Math.pow(1.1, delta / 1000.0);
+    modifier.apply({}, args);
+
+    var afterMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
+    var nudge = [ afterMiddle[0] - beforeMiddle[0], afterMiddle[1] - beforeMiddle[1] ];
+
+    var c = Math.cos(rotation);
+    var s = Math.sin(rotation);
+
+    offset[0] += scaleFactor * ( c * nudge[0] - s * nudge[1] );
+    offset[1] += scaleFactor * ( s * nudge[0] + c * nudge[1] );
+}
+
+function zoomInternal(mult)
+{
+    scaleFactor *= mult;
     if( scaleFactor > 10.0 )
     {
         scaleFactor = 10.0;
@@ -384,14 +415,27 @@ function mouseWheel(event)
     {
         scaleFactor = 1.0 / 10.0;
     }
+}
 
-    var afterMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
+function zoom(mult)
+{
+    preserveCenterDo(zoomInternal, [mult]);
+}
 
-    var nudge = [ afterMiddle[0] - beforeMiddle[0], afterMiddle[1] - beforeMiddle[1] ];
+function rotateInternal(theta)
+{
+    rotation += theta;
+}
 
-    offset[0] += nudge[0] * scaleFactor;
-    offset[1] += nudge[1] * scaleFactor;
+function rotate(theta)
+{
+    preserveCenterDo(rotateInternal, [theta]);
+}
 
+function mouseWheel(event)
+{
+    var delta = event.wheelDeltaY;
+    scaleFactor *= Math.pow(1.1, delta / 1000.0);
     drawScreen();
 }
 
@@ -435,11 +479,11 @@ function keyDown(event)
         return;
 
         case 187: // =
-            scaleFactor *= 1.1;
+            zoom(1.1);
         break;
 
         case 189: // -
-            scaleFactor /= 1.1;
+            zoom(1.0/1.1);
         break;
 
         case 37: // left
@@ -453,6 +497,14 @@ function keyDown(event)
             break;
         case 40: // down
             offset[1] += 30;
+            break;
+
+        case 190: //.
+            rotate(Math.PI / 12);
+            break;
+
+        case 188: //,
+            rotate(-Math.PI / 12);
             break;
     }
 
