@@ -40,6 +40,36 @@ Node.prototype.draw = function(ctx, info)
     }
 }
 
+Node.prototype.getMatrix = function()
+{
+    var c = Math.cos(this.rotation);
+    var s = Math.sin(this.rotation);
+    return [
+        [this.scaleFactor * c, this.scaleFactor * s, 0, 0],
+        [-this.scaleFactor * s, this.scaleFactor * c, 0, 0],
+        [0, 0, 1, 0],
+        [this.position[0], this.position[1], 0, 1]
+    ];
+}
+
+Node.prototype.zoom = function(factor)
+{
+    this.scaleFactor *= factor;
+    if( this.scaleFactor > 10.0 )
+    {
+        this.scaleFactor = 10.0;
+    }
+    if( this.scaleFactor < 1.0 / 10.0 )
+    {
+        this.scaleFactor = 1.0 / 10.0;
+    }
+}
+
+Node.prototype.rotate = function(theta)
+{
+    this.rotation += theta;
+}
+
 Node.prototype.setPosition = function(x, y)
 {
     this.position[0] = x;

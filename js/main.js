@@ -11,14 +11,10 @@ var exportWindow = null;
 var lastEvent;
 var heldKeys = {};
 
-var offset = [0, 0];
-var scaleFactor = 1.0;
-var rotation = 0.0;
+var view = new Node();
 
 var LOOP_ID = null;
 var APP_STATE = null;
-
-var cellSize = 100;
 
 var polyTraceDocument = new PolyTraceDocument();
 var polygonTool = new PolygonTool();
@@ -120,7 +116,7 @@ function loadImage(file)
         var img = new Image();
         img.onload = function()
         {
-            var newImageInfo = new ImageInfo(img, [100,100]);
+            var newImageInfo = new ImageInfo(img, [0,0]);
             polyTraceDocument.addImage(newImageInfo);
             undoManager.push(
                 polyTraceDocument.removeImage, polyTraceDocument, [newImageInfo],
@@ -206,29 +202,17 @@ function titleScreenLoop(t)
     /***** end draw title text *****/
 }
 
-function getViewMatrix()
-{
-    var c = Math.cos(rotation);
-    var s = Math.sin(rotation);
-    return [
-        [scaleFactor * c, scaleFactor * s, 0, 0],
-        [-scaleFactor * s, scaleFactor * c, 0, 0],
-        [0, 0, 1, 0],
-        [offset[0], offset[1], 0, 1]
-    ];
-}
-
 function worldToCanvas(position)
 {
     return matrix4.transformPoint(
-        getViewMatrix(),
+        view.getMatrix(),
         [position[0], position[1], 0]).slice(0,2);
 }
 
 function canvasToWorld(position)
 {
     return matrix4.transformPoint(
-        matrix4.inverse(getViewMatrix()),
+        matrix4.inverse(view.getMatrix()),
         [position[0], position[1], 0]).slice(0,2);
 }
 
@@ -243,7 +227,7 @@ function drawLine(p, q)
     ctx.stroke();
 }
 
-function drawGrid()
+function drawGrid(cellSize)
 {
     var corners = [
         canvasToWorld([0, 0]),
@@ -315,7 +299,7 @@ function drawScreen()
 {
     clearScreen();
     polyTraceDocument.draw(ctx, {"convert":worldToCanvas});
-    drawGrid();
+    drawGrid(100);
     manageCursor();
 }
 
@@ -362,7 +346,7 @@ function mouseDown(event)
             polyTraceDocument : polyTraceDocument,
             worldLocation : canvasToWorld(v),
             event : event,
-            offset : offset});
+            offset : view.position});
     }
     else if( APP_STATE == 'end' )
     {
@@ -383,48 +367,30 @@ function doubleClick()
     drawScreen();
 }
 
-function preserveCenterDo(modifier, args)
+function preserveCenterDo(obj, modifier, args)
 {
     var beforeMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
 
-    modifier.apply({}, args);
+    modifier.apply(obj, args);
 
     var afterMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
     var nudge = [ afterMiddle[0] - beforeMiddle[0], afterMiddle[1] - beforeMiddle[1] ];
 
-    var c = Math.cos(rotation);
-    var s = Math.sin(rotation);
+    var c = Math.cos(view.rotation);
+    var s = Math.sin(view.rotation);
 
-    offset[0] += scaleFactor * ( c * nudge[0] - s * nudge[1] );
-    offset[1] += scaleFactor * ( s * nudge[0] + c * nudge[1] );
-}
-
-function zoomInternal(mult)
-{
-    scaleFactor *= mult;
-    if( scaleFactor > 10.0 )
-    {
-        scaleFactor = 10.0;
-    }
-    if( scaleFactor < 1.0 / 10.0 )
-    {
-        scaleFactor = 1.0 / 10.0;
-    }
+    view.position[0] += view.scaleFactor * ( c * nudge[0] - s * nudge[1] );
+    view.position[1] += view.scaleFactor * ( s * nudge[0] + c * nudge[1] );
 }
 
 function zoom(mult)
 {
-    preserveCenterDo(zoomInternal, [mult]);
-}
-
-function rotateInternal(theta)
-{
-    rotation += theta;
+    preserveCenterDo(view, view.zoom, [mult]);
 }
 
 function rotate(theta)
 {
-    preserveCenterDo(rotateInternal, [theta]);
+    preserveCenterDo(view, view.rotate, [theta]);
 }
 
 function mouseWheel(event)
