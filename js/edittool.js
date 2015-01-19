@@ -18,7 +18,7 @@ EditTool.prototype.mouseDown = function(eventInfo)
 
     draggableList = draggableList.concat( eventInfo.polyTraceDocument.images );
 
-    for( var i = 0; i < draggableList.length; i++ )
+    for( var i = draggableList.length-1; i >= 0 ; i-- )
     {
         if( draggableList[i].clickIn(screenloc) )
         {
