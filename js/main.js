@@ -311,24 +311,10 @@ function drawGrid()
     ctx.restore();
 }
 
-function getDrawList()
-{
-    return [].concat(
-        polyTraceDocument.rootNode.children);
-}
-
-function draw(drawList)
-{
-    for ( var i=0; i<drawList.length; i++ )
-    {
-        drawList[i].draw(ctx, {"convert":worldToCanvas});
-    }
-}
-
 function drawScreen()
 {
     clearScreen();
-    draw( getDrawList() );
+    polyTraceDocument.draw(ctx, {"convert":worldToCanvas});
     drawGrid();
     manageCursor();
 }
