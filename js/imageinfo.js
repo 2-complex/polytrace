@@ -24,8 +24,9 @@ ImageInfo.prototype.clickIn = function(screenloc)
            canvasLoc[1] - cornerB[1] < 0;
 }
 
-ImageInfo.prototype.draw = function(ctx, convert)
+ImageInfo.prototype.draw = function(ctx, info)
 {
+    var convert = info.convert;
     var corner = convert(this.position);
     var origin = convert([0,0]);
     var right = convert([1,0]);

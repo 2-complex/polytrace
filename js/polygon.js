@@ -6,8 +6,10 @@ Polygon = function()
     this.closed = false;
 }
 
-Polygon.prototype.draw = function(ctx, convert)
+Polygon.prototype.draw = function(ctx, info)
 {
+    var convert = info.convert;
+
     if( this.vertices.length > 0 )
     {
         ctx.beginPath();

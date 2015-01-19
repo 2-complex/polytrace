@@ -314,15 +314,14 @@ function drawGrid()
 function getDrawList()
 {
     return [].concat(
-        polyTraceDocument.images,
-        polyTraceDocument.polygons);
+        polyTraceDocument.rootNode.children);
 }
 
 function draw(drawList)
 {
     for ( var i=0; i<drawList.length; i++ )
     {
-        drawList[i].draw(ctx, worldToCanvas);
+        drawList[i].draw(ctx, {"convert":worldToCanvas});
     }
 }
 
