@@ -311,28 +311,26 @@ function drawGrid()
     ctx.restore();
 }
 
-function drawImages()
+function getDrawList()
 {
-    for ( var i=0; i<polyTraceDocument.images.length; i++ )
-    {
-        polyTraceDocument.images[i].draw(ctx, worldToCanvas);
-    }
+    return [].concat(
+        polyTraceDocument.images,
+        polyTraceDocument.polygons);
 }
 
-function drawPolygons()
+function draw(drawList)
 {
-    for ( var i=0; i<polyTraceDocument.polygons.length; i++ )
+    for ( var i=0; i<drawList.length; i++ )
     {
-        polyTraceDocument.polygons[i].draw(ctx, worldToCanvas);
+        drawList[i].draw(ctx, worldToCanvas);
     }
 }
 
 function drawScreen()
 {
     clearScreen();
-    drawImages();
+    draw( getDrawList() );
     drawGrid();
-    drawPolygons();
     manageCursor();
 }
 

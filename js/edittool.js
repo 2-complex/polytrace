@@ -9,6 +9,7 @@ EditTool.prototype.mouseDown = function(eventInfo)
 {
     var event = eventInfo.event;
     var screenloc = [event.offsetX, event.offsetY];
+
     var draggableList = [];
 
     for( var i = 0; i < eventInfo.polyTraceDocument.polygons.length; i++ )
@@ -16,7 +17,7 @@ EditTool.prototype.mouseDown = function(eventInfo)
         draggableList = draggableList.concat(eventInfo.polyTraceDocument.polygons[i].handles);
     }
 
-    draggableList = draggableList.concat( eventInfo.polyTraceDocument.images );
+    draggableList = eventInfo.polyTraceDocument.images.concat( draggableList );
 
     for( var i = draggableList.length-1; i >= 0 ; i-- )
     {

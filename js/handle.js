@@ -2,7 +2,6 @@
 function Handle(position)
 {
     Draggable.call(this);
-
     this.position = position;
 }
 
