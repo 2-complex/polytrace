@@ -20,8 +20,9 @@ Handle.prototype.clickIn = function(screenloc)
            dy < Handle.HANDLE_RADIUS && dy > -Handle.HANDLE_RADIUS;
 }
 
-Handle.prototype.draw = function(ctx, convert)
+Handle.prototype.draw = function(ctx, info)
 {
+    var convert = info.convert;
     var v = convert(this.position);
 
     var x = v[0]

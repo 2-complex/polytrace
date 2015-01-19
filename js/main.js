@@ -12,19 +12,18 @@ var lastEvent;
 var heldKeys = {};
 
 var view = new Node();
+var undoManager = new UndoManager();
+var polyTraceDocument = new PolyTraceDocument();
 
 var LOOP_ID = null;
 var APP_STATE = null;
 
-var polyTraceDocument = new PolyTraceDocument();
 var polygonTool = new PolygonTool();
 var handTool = new HandTool();
 var editTool = new EditTool();
 
 var selectedTool = polygonTool;
 var tempTool = null;
-
-var undoManager = new UndoManager();
 
 var math = o3djs.math;
 var matrix4 = o3djs.math.matrix4;
@@ -298,7 +297,7 @@ function drawGrid(cellSize)
 function drawScreen()
 {
     clearScreen();
-    polyTraceDocument.draw(ctx, {"convert":worldToCanvas});
+    polyTraceDocument.draw(ctx, {convert:worldToCanvas});
     drawGrid(100);
     manageCursor();
 }
@@ -448,16 +447,16 @@ function keyDown(event)
         break;
 
         case 37: // left
-            offset[0] -= 30;
+            view.position[0] -= 30;
             break;
         case 38: // up
-            offset[1] -= 30;
+            view.position[1] -= 30;
             break;
         case 39: // right
-            offset[0] += 30;
+            view.position[0] += 30;
             break;
         case 40: // down
-            offset[1] += 30;
+            view.position[1] += 30;
             break;
 
         case 190: //.

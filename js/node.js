@@ -7,6 +7,8 @@ function Node()
     this.rotation = 0;
     this.scaleFactor = 1;
     this.children = [];
+
+    this.positionHandle = new Handle(this.position);
 }
 
 Node.prototype = inherit([Draggable]);
@@ -34,6 +36,8 @@ Node.prototype.remove = function(drawable)
 
 Node.prototype.draw = function(ctx, info)
 {
+    this.positionHandle.draw(ctx, info);
+
     for( var i = 0; i < this.children.length; i++ )
     {
         this.children[i].draw(ctx, info);
@@ -68,6 +72,11 @@ Node.prototype.zoom = function(factor)
 Node.prototype.rotate = function(theta)
 {
     this.rotation += theta;
+}
+
+Node.prototype.getDraggables = function()
+{
+    return [this.positionHandle];
 }
 
 Node.prototype.setPosition = function(x, y)

@@ -36,7 +36,7 @@ Polygon.prototype.draw = function(ctx, info)
 
     for ( var i=0; i<this.vertices.length; i++ )
     {
-        this.handles[i].draw(ctx, convert);
+        this.handles[i].draw(ctx, info);
     }
 }
 
