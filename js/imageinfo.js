@@ -26,11 +26,19 @@ ImageInfo.prototype.clickIn = function(screenloc)
 
 ImageInfo.prototype.draw = function(ctx, convert)
 {
-    var pc = convert(this.position);
-    var pd = convert([
-        this.position[0] + this.img.width,
-        this.position[1] + this.img.height]);
+    var corner = convert(this.position);
+    var origin = convert([0,0]);
+    var right = convert([1,0]);
+    var up = convert([0,1]);
+    right = [right[0] - origin[0], right[1] - origin[1]];
+    up = [up[0] - origin[0], up[1] - origin[1]];
 
-    ctx.drawImage(this.img, pc[0], pc[1], pd[0] - pc[0], pd[1] - pc[1]);
+    ctx.save();
+    ctx.transform(
+        right[0], right[1],
+        up[0], up[1],
+        corner[0], corner[1]);
+    ctx.drawImage(this.img, 0, 0);
+    ctx.restore();
 }
 
