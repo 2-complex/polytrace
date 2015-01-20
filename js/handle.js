@@ -23,7 +23,7 @@ Handle.prototype.clickIn = function(screenloc)
 Handle.prototype.draw = function(ctx, info)
 {
     var convert = info.convert;
-    var v = convert(this.position);
+    var v = convert(matrix4.transformPoint2(info.matrix, this.position));
 
     var x = v[0]
     var y = v[1];

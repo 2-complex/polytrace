@@ -27,10 +27,10 @@ ImageInfo.prototype.clickIn = function(screenloc)
 ImageInfo.prototype.draw = function(ctx, info)
 {
     var convert = info.convert;
-    var corner = convert(this.position);
-    var origin = convert([0,0]);
-    var right = convert([1,0]);
-    var up = convert([0,1]);
+    var corner = convert(matrix4.transformPoint2(info.matrix, this.position));
+    var origin = convert(matrix4.transformPoint2(info.matrix, [0,0]));
+    var right = convert(matrix4.transformPoint2(info.matrix, [1,0]));
+    var up = convert(matrix4.transformPoint2(info.matrix, [0,1]));
     right = [right[0] - origin[0], right[1] - origin[1]];
     up = [up[0] - origin[0], up[1] - origin[1]];
 

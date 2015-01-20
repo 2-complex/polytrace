@@ -1624,6 +1624,21 @@ o3djs.math.matrix4.transformPoint = function(m, v) {
           (v0 * m0[2] + v1 * m1[2] + v2 * m2[2] + m3[2]) / d];
 };
 
+o3djs.math.matrix4.transformPoint2 = function(m, v) {
+  var v0 = v[0];
+  var v1 = v[1];
+  var v2 = 0.0;
+  var m0 = m[0];
+  var m1 = m[1];
+  var m2 = m[2];
+  var m3 = m[3];
+
+  var d = v0 * m0[3] + v1 * m1[3] + v2 * m2[3] + m3[3];
+  return [(v0 * m0[0] + v1 * m1[0] + v2 * m2[0] + m3[0]) / d,
+          (v0 * m0[1] + v1 * m1[1] + v2 * m2[1] + m3[1]) / d];
+};
+
+
 /**
  * Takes a 4-by-4 matrix and a vector with 4 entries, transforms that vector by
  * the matrix, and returns the result as a vector with 4 entries.

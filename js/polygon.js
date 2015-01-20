@@ -16,18 +16,18 @@ Polygon.prototype.draw = function(ctx, info)
         ctx.lineWidth = 2;
         ctx.strokeStyle = polygonStrokeColor;
 
-        var v = convert(this.vertices[0]);
+        var v = convert(matrix4.transformPoint2(info.matrix, this.vertices[0]));
         ctx.moveTo(v[0], v[1]);
 
         for ( var i=1; i<this.vertices.length; i++ )
         {
-            var v = convert(this.vertices[i]);
+            var v = convert(matrix4.transformPoint2(info.matrix, this.vertices[i]));
             ctx.lineTo(v[0], v[1]);
         }
 
         if( this.closed )
         {
-            var v = convert(this.vertices[0]);
+            var v = convert(matrix4.transformPoint2(info.matrix, this.vertices[0]));
             ctx.lineTo(v[0], v[1]);
         }
 

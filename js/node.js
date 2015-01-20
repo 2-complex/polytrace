@@ -13,16 +13,6 @@ function Node()
 
 Node.prototype = inherit([Draggable]);
 
-Node.prototype.getMatrix = function()
-{
-    return [
-        [1, 0, 0, 0],
-        [0, 1, 0, 0],
-        [0, 0, 1, 0],
-        [0, 0, 0, 1]
-    ];
-}
-
 Node.prototype.add = function(drawable)
 {
     this.children.push(drawable);
@@ -36,12 +26,20 @@ Node.prototype.remove = function(drawable)
 
 Node.prototype.draw = function(ctx, info)
 {
+    info = info || {};
+    info.matrix = info.matrix || matrix4.identity();
+
     this.positionHandle.draw(ctx, info);
+
+    var temp = info.matrix;
+    info.matrix = matrix4.compose(info.matrix, this.getMatrix());
 
     for( var i = 0; i < this.children.length; i++ )
     {
         this.children[i].draw(ctx, info);
     }
+
+    info.matrix = temp;
 }
 
 Node.prototype.getMatrix = function()
