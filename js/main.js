@@ -10,15 +10,13 @@ var exportWindow = null;
 
 var heldKeys = {};
 
-var offset = [0, 0];
-var scaleFactor = 1.0;
+var view = new Node();
+var undoManager = new UndoManager();
+var polyTraceDocument = new PolyTraceDocument();
 
 var LOOP_ID = null;
 var APP_STATE = null;
 
-var cellSize = 100;
-
-var polyTraceDocument = new PolyTraceDocument();
 var polygonTool = new PolygonTool();
 var handTool = new HandTool();
 var editTool = new EditTool();
@@ -26,7 +24,8 @@ var editTool = new EditTool();
 var selectedTool = polygonTool;
 var tempTool = null;
 
-var undoManager = new UndoManager();
+var math = o3djs.math;
+var matrix4 = o3djs.math.matrix4;
 
 
 function currentTool()
@@ -122,7 +121,7 @@ function loadImage(file)
         var img = new Image();
         img.onload = function()
         {
-            var newImageInfo = new ImageInfo(img, [100, 100]);
+            var newImageInfo = new ImageInfo(img, [0,0]);
             polyTraceDocument.addImage(newImageInfo);
             undoManager.push(
                 polyTraceDocument.removeImage, polyTraceDocument, [newImageInfo],
@@ -179,25 +178,25 @@ function titleScreenLoop(t)
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = "80px Arial";
-    ctx.translate(canvas.width() / 2, canvas.height() / 2);
+    ctx.translate(canvas.width()/2, canvas.height()/2);
 
     ctx.save();
     var w = 200;
     var h = 100;
     ctx.fillStyle = "#00f";
-    ctx.fillRect(-w, -h, 2 * w, 2 * h);
+    ctx.fillRect(-w, -h, 2*w, 2*h);
     ctx.restore();
 
     ctx.save();
     ctx.fillStyle = "#000";
     ctx.translate(0, 35);
-    ctx.fillText("TRACE", 0, 0);
+    ctx.fillText("TRACE", 0,0);
     ctx.restore();
 
     ctx.save();
     ctx.fillStyle = "#0ef";
     ctx.translate(0, -35);
-    ctx.fillText("POLY", 0, 0);
+    ctx.fillText("POLY", 0,0);
     ctx.restore();
 
     ctx.fillStyle = "#555";
@@ -209,15 +208,18 @@ function titleScreenLoop(t)
     /***** end draw title text *****/
 }
 
-
 function worldToCanvas(position)
 {
-    return [scaleFactor * position[0] + offset[0], scaleFactor * position[1] + offset[1]];
+    return matrix4.transformPoint(
+        view.getMatrix(),
+        [position[0], position[1], 0]).slice(0,2);
 }
 
 function canvasToWorld(position)
 {
-    return [(position[0] - offset[0]) / scaleFactor, (position[1] - offset[1]) / scaleFactor];
+    return matrix4.transformPoint(
+        matrix4.inverse(view.getMatrix()),
+        [position[0], position[1], 0]).slice(0,2);
 }
 
 function drawLine(p, q)
@@ -231,15 +233,27 @@ function drawLine(p, q)
     ctx.stroke();
 }
 
-function drawGrid()
+function drawGrid(cellSize)
 {
-    var ll = canvasToWorld([0, 0]);
-    var ur = canvasToWorld([canvas.width(), canvas.height()]);
+    var corners = [
+        canvasToWorld([0, 0]),
+        canvasToWorld([0, canvas.height()]),
+        canvasToWorld([canvas.width(), 0]),
+        canvasToWorld([canvas.width(), canvas.height()])
+    ];
 
-    var worldLeft = ll[0];
-    var worldBottom = ll[1];
-    var worldRight = ur[0];
-    var worldTop = ur[1];
+    var worldLeft = corners[0][1];
+    var worldBottom = corners[0][1];
+    var worldRight = corners[0][0];
+    var worldTop = corners[0][1];
+
+    for( var i = 0; i < corners.length; i++ )
+    {
+        worldLeft = Math.min(worldLeft, corners[i][0]);
+        worldRight = Math.max(worldRight, corners[i][0]);
+        worldBottom = Math.min(worldBottom, corners[i][1]);
+        worldTop = Math.max(worldTop, corners[i][1]);
+    }
 
     worldLeft = Math.floor( worldLeft / cellSize ) * cellSize;
     worldRight = (Math.floor( worldRight / cellSize ) + 1) * cellSize;
@@ -256,7 +270,7 @@ function drawGrid()
     ctx.strokeStyle = gridColor;
 
 
-    // draw vertical lines
+    // draw 'vertical' lines
     for( var i = 1; i <= columns; i++ )
     {
         ctx.beginPath();
@@ -270,7 +284,7 @@ function drawGrid()
         ctx.stroke();
     }
 
-    // draw horizontal lines
+    // draw 'horizontal' lines
     for( var i = 1; i <= rows; i++ )
     {
         ctx.beginPath();
@@ -287,28 +301,11 @@ function drawGrid()
     ctx.restore();
 }
 
-function drawImages()
-{
-    for( var i = 0; i < polyTraceDocument.images.length; i++ )
-    {
-        polyTraceDocument.images[i].draw(ctx, worldToCanvas);
-    }
-}
-
-function drawPolygons()
-{
-    for( var i = 0; i < polyTraceDocument.polygons.length; i++ )
-    {
-        polyTraceDocument.polygons[i].draw(ctx, worldToCanvas);
-    }
-}
-
 function drawScreen()
 {
     clearScreen();
-    drawImages();
-    drawGrid();
-    drawPolygons();
+    polyTraceDocument.draw(ctx, {convert:worldToCanvas});
+    drawGrid(100);
     manageCursor();
 }
 
@@ -353,7 +350,7 @@ function mouseDown(event)
             polyTraceDocument : polyTraceDocument,
             worldLocation : canvasToWorld(v),
             event : event,
-            offset : offset});
+            offset : view.position});
     }
     else if( APP_STATE == 'end' )
     {
@@ -370,28 +367,37 @@ function doubleClick()
     }
 }
 
+function preserveCenterDo(obj, modifier, args)
+{
+    var beforeMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
+
+    modifier.apply(obj, args);
+
+    var afterMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
+    var nudge = [ afterMiddle[0] - beforeMiddle[0], afterMiddle[1] - beforeMiddle[1] ];
+
+    var c = Math.cos(view.rotation);
+    var s = Math.sin(view.rotation);
+
+    view.position[0] += view.scaleFactor * ( c * nudge[0] - s * nudge[1] );
+    view.position[1] += view.scaleFactor * ( s * nudge[0] + c * nudge[1] );
+}
+
+function zoom(mult)
+{
+    preserveCenterDo(view, view.zoom, [mult]);
+}
+
+function rotate(theta)
+{
+    preserveCenterDo(view, view.rotate, [theta]);
+}
+
 function mouseWheel(event)
 {
     var delta = event.originalEvent.wheelDeltaY;
-
-    var beforeMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
-
-    scaleFactor *= Math.pow(1.1, delta / 1000.0);
-    if( scaleFactor > 10.0 )
-    {
-        scaleFactor = 10.0;
-    }
-    if( scaleFactor < 1.0 / 10.0 )
-    {
-        scaleFactor = 1.0 / 10.0;
-    }
-
-    var afterMiddle = canvasToWorld([canvas.width() / 2, canvas.height() / 2]);
-
-    var nudge = [ afterMiddle[0] - beforeMiddle[0], afterMiddle[1] - beforeMiddle[1] ];
-
-    offset[0] += nudge[0] * scaleFactor;
-    offset[1] += nudge[1] * scaleFactor;
+    zoom(Math.pow(1.1, delta / 1000.0));
+    drawScreen();
 }
 
 function mouseMove(event)
@@ -427,28 +433,36 @@ function keyDown(theEvent)
     switch( theEvent.which )
     {
         case KEYS.EQUALS:
-            scaleFactor *= 1.1;
+            zoom(1.1);
         break;
 
         case KEYS.DASH:
-            scaleFactor /= 1.1;
+            zoom(1.0 / 1.1);
         break;
 
         case KEYS.LEFT_ARROW:
-            offset[0] -= 30;
-        break;
+            view.position[0] -= 30;
+            break;
 
         case KEYS.UP_ARROW:
-            offset[1] -= 30;
-        break;
+            view.position[1] -= 30;
+            break;
 
         case KEYS.RIGHT_ARROW:
-            offset[0] += 30;
-        break;
+            view.position[0] += 30;
+            break;
 
         case KEYS.DOWN_ARROW:
-            offset[1] += 30;
-        break;
+            view.position[1] += 30;
+            break;
+
+        case KEYS.PERIOD:
+            rotate(Math.PI / 12);
+            break;
+
+        case KEYS.COMMA:
+            rotate(-Math.PI / 12);
+            break;
     }
 
     var isMetaDown = (heldKeys[KEYS.LEFT_META] > 0 || heldKeys[KEYS.RIGHT_META] > 0);
@@ -459,10 +473,10 @@ function keyDown(theEvent)
         undoManager.undo();
         theEvent.stopPropagation();
         result = false;
-    }
+}
 
     if(isMetaDown && isShiftDown && theEvent.which === KEYS.KEY_Z) // Command + Shift + Z
-    { 
+{
         undoManager.redo();
         theEvent.stopPropagation();
         result = false;
@@ -471,10 +485,10 @@ function keyDown(theEvent)
     heldKeys[theEvent.which] = (heldKeys[theEvent.which]++) || 1;
 
     return result;
-}
+    }
 
 function keyUp()
-{
+    {
     heldKeys[event.which]--;
-}
+    }
 

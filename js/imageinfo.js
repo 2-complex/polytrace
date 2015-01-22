@@ -24,13 +24,22 @@ ImageInfo.prototype.clickIn = function(screenloc)
            canvasLoc[1] - cornerB[1] < 0;
 }
 
-ImageInfo.prototype.draw = function(ctx, convert)
+ImageInfo.prototype.draw = function(ctx, info)
 {
-    var pc = convert(this.position);
-    var pd = convert([
-        this.position[0] + this.img.width,
-        this.position[1] + this.img.height]);
+    var convert = info.convert;
+    var corner = convert(matrix4.transformPoint2(info.matrix, this.position));
+    var origin = convert(matrix4.transformPoint2(info.matrix, [0,0]));
+    var right = convert(matrix4.transformPoint2(info.matrix, [1,0]));
+    var up = convert(matrix4.transformPoint2(info.matrix, [0,1]));
+    right = [right[0] - origin[0], right[1] - origin[1]];
+    up = [up[0] - origin[0], up[1] - origin[1]];
 
-    ctx.drawImage(this.img, pc[0], pc[1], pd[0] - pc[0], pd[1] - pc[1]);
+    ctx.save();
+    ctx.transform(
+        right[0], right[1],
+        up[0], up[1],
+        corner[0], corner[1]);
+    ctx.drawImage(this.img, 0, 0);
+    ctx.restore();
 }
 

@@ -8,23 +8,15 @@ function EditTool(traceDocument)
 EditTool.prototype.mouseDown = function(eventInfo)
 {
     var event = eventInfo.event;
-
     var screenloc = [event.offsetX, event.offsetY];
 
-    var draggableList = [];
+    var draggables = eventInfo.polyTraceDocument.getDraggables();
 
-    for( var i = 0; i < eventInfo.polyTraceDocument.polygons.length; i++ )
+    for( var i = draggables.length-1; i >= 0 ; i-- )
     {
-        draggableList = draggableList.concat(eventInfo.polyTraceDocument.polygons[i].handles);
-    }
-
-    draggableList = draggableList.concat( eventInfo.polyTraceDocument.images );
-
-    for( var i = 0; i < draggableList.length; i++ )
-    {
-        if( draggableList[i].clickIn(screenloc) )
+        if( draggables[i].clickIn(screenloc) )
         {
-            this.draggable = draggableList[i];
+            this.draggable = draggables[i];
             break;
         }
     }

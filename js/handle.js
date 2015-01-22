@@ -2,7 +2,6 @@
 function Handle(position)
 {
     Draggable.call(this);
-
     this.position = position;
 }
 
@@ -21,9 +20,11 @@ Handle.prototype.clickIn = function(screenloc)
            dy < Handle.HANDLE_RADIUS && dy > -Handle.HANDLE_RADIUS;
 }
 
-Handle.prototype.draw = function(ctx, convert)
+Handle.prototype.draw = function(ctx, info)
 {
-    var v = convert(this.position);
+    var convert = info.convert;
+    var v = convert(matrix4.transformPoint2(info.matrix, this.position));
+
     var x = v[0]
     var y = v[1];
     var w = Handle.HANDLE_RADIUS;
@@ -31,6 +32,6 @@ Handle.prototype.draw = function(ctx, convert)
 
     ctx.fillStyle = polygonStrokeColor;
     ctx.strokeStyle = polygonStrokeColor;
-    ctx.strokeRect(x - w, y - w, 2 * w, 2 * h);
+    ctx.strokeRect(x-w, y-w, 2*w, 2*h);
 }
 
