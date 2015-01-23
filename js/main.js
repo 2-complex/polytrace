@@ -11,7 +11,7 @@ var exportWindow = null;
 var heldKeys = {};
 
 var view = new Node();
-var undoManager = new UndoManager();
+var undoManager = new UndoManager(drawScreen);
 var polyTraceDocument = new PolyTraceDocument();
 
 var LOOP_ID = null;
@@ -105,8 +105,8 @@ $(document).ready(function ()
     handButton.on('mousedown', function() {selectedTool = handTool;});
     editButton.on('mousedown', function() {selectedTool = editTool;} );
 
-    undoButton.on('mousedown', function() {undoManager.undo(); drawScreen();});
-    redoButton.on('mousedown', function() {undoManager.redo(); drawScreen();});
+    undoButton.on('mousedown', function() {undoManager.undo();});
+    redoButton.on('mousedown', function() {undoManager.redo();});
 });
 
 function loadImage(file)
@@ -268,7 +268,6 @@ function drawGrid(cellSize)
 
     ctx.lineWidth = "1";
     ctx.strokeStyle = gridColor;
-
 
     // draw 'vertical' lines
     for( var i = 1; i <= columns; i++ )
@@ -473,22 +472,27 @@ function keyDown(theEvent)
         undoManager.undo();
         theEvent.stopPropagation();
         result = false;
-}
+    }
 
     if(isMetaDown && isShiftDown && theEvent.which === KEYS.KEY_Z) // Command + Shift + Z
-{
+    {
         undoManager.redo();
         theEvent.stopPropagation();
         result = false;
     }
 
+    if( theEvent.which === KEYS.KEY_H )
+    {
+        undoManager.redo();
+    }
+
     heldKeys[theEvent.which] = (heldKeys[theEvent.which]++) || 1;
 
     return result;
-    }
+}
 
 function keyUp()
-    {
+{
     heldKeys[event.which]--;
-    }
+}
 
