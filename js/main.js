@@ -8,11 +8,10 @@ var undoButton;
 var redoButton;
 var exportWindow = null;
 
-var lastEvent;
 var heldKeys = {};
 
 var view = new Node();
-var undoManager = new UndoManager();
+var undoManager = new UndoManager(drawScreen);
 var polyTraceDocument = new PolyTraceDocument();
 
 var LOOP_ID = null;
@@ -38,10 +37,10 @@ function currentTool()
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
 var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 
-$(document).ready(function documentReady ()
+$(document).ready(function ()
 {
     body = $('body');
-    canvas = $("#canvas");
+    canvas = $('#canvas');
     exportButton = $('button.export');
 
     polyButton = $('button.poly');
@@ -50,16 +49,19 @@ $(document).ready(function documentReady ()
     undoButton = $('button.undo');
     redoButton = $('button.redo');
 
-    window.onkeydown = keyDown;
-    window.onkeyup = keyUp;
-
     canvas.on("mousedown", mouseDown);
     canvas.on("mouseup", mouseUp);
     canvas.on("mousemove", mouseMove);
     canvas.on("dblclick", doubleClick);
     canvas.on("mousewheel", mouseWheel);
+    // Redraw screen for these events
+    canvas.on("mousedown mouseup mousemove dblclick mousewheel", drawScreen);
 
     $(window).on("resize", resize);
+    $(window).on("keydown", keyDown);
+    $(window).on("keyup", keyUp);
+    // Redraw screen for these events
+    $(window).on("resize keydown keyup", drawScreen);
 
     if( canvas[0].getContext )
     {
@@ -75,11 +77,13 @@ $(document).ready(function documentReady ()
     canvas.on('dragover', function(e){
         e.stopPropagation();
         e.preventDefault();
+        return false;
     });
 
     canvas.on('dragenter', function(e){
         e.stopPropagation();
         e.preventDefault();
+        return false;
     });
 
     canvas.on('drop', function(e){
@@ -89,6 +93,8 @@ $(document).ready(function documentReady ()
                 e.stopPropagation();
 
                 loadImage(e.originalEvent.dataTransfer.files[0]);
+
+                return false;
             }
         }
     });
@@ -99,8 +105,8 @@ $(document).ready(function documentReady ()
     handButton.on('mousedown', function() {selectedTool = handTool;});
     editButton.on('mousedown', function() {selectedTool = editTool;} );
 
-    undoButton.on('mousedown', function() {undoManager.undo(); drawScreen();});
-    redoButton.on('mousedown', function() {undoManager.redo(); drawScreen();});
+    undoButton.on('mousedown', function() {undoManager.undo();});
+    redoButton.on('mousedown', function() {undoManager.redo();});
 });
 
 function loadImage(file)
@@ -194,7 +200,8 @@ function titleScreenLoop(t)
     ctx.restore();
 
     ctx.fillStyle = "#555";
-    ctx.font = (20*Math.atan(Math.PI*t/1000)+40)+"px Arial";
+    var fontSizeBasedOnTime = (20 * Math.atan(Math.PI * t / 1000) + 40);
+    ctx.font = fontSizeBasedOnTime + "px Arial";
     ctx.fillText("A tool for drawing a polygon path over an image.", 0,200);
 
     ctx.restore();
@@ -262,7 +269,6 @@ function drawGrid(cellSize)
     ctx.lineWidth = "1";
     ctx.strokeStyle = gridColor;
 
-
     // draw 'vertical' lines
     for( var i = 1; i <= columns; i++ )
     {
@@ -320,8 +326,6 @@ function resize(event)
 {
     canvas.attr('width', window.innerWidth);
     canvas.attr('height', window.innerHeight);
-
-    drawScreen();
 }
 
 function mouseDown(event)
@@ -350,8 +354,6 @@ function mouseDown(event)
     else if( APP_STATE == 'end' )
     {
     }
-
-    drawScreen();
 }
 
 function doubleClick()
@@ -362,8 +364,6 @@ function doubleClick()
             polyTraceDocument : polyTraceDocument,
             event : event});
     }
-
-    drawScreen();
 }
 
 function preserveCenterDo(obj, modifier, args)
@@ -403,100 +403,96 @@ function mouseMove(event)
 {
     var v = [event.offsetX, event.offsetY];
 
-    currentTool().mouseMove({
+    var params = {
         polyTraceDocument : polyTraceDocument,
         worldLocation : canvasToWorld(v),
-        event : event});
-
-    drawScreen();
+        event : event
+    };
+    currentTool().mouseMove(params);
 }
 
 function mouseUp(event)
 {
     var v = [event.offsetX, event.offsetY];
 
-    currentTool().mouseUp({
+    var params = {
         polyTraceDocument : polyTraceDocument,
         worldLocation : canvasToWorld(v),
-        event : event});
+        event : event
+    };
+    currentTool().mouseUp(params);
 
     tempTool = null;
-    drawScreen();
 }
 
-function keyDown(event)
+function keyDown(theEvent)
 {
-    if (lastEvent && lastEvent.which == event.which)
-    {
-        return;
-    }
+    var result = true;
 
-    switch( event.which )
+    switch( theEvent.which )
     {
-        case 16: // shift
-        case 17: // ctrl
-        case 18: // alt
-        return;
-
-        case 187: // =
+        case KEYS.EQUALS:
             zoom(1.1);
         break;
 
-        case 189: // -
-            zoom(1.0/1.1);
+        case KEYS.DASH:
+            zoom(1.0 / 1.1);
         break;
 
-        case 37: // left
+        case KEYS.LEFT_ARROW:
             view.position[0] -= 30;
             break;
-        case 38: // up
+
+        case KEYS.UP_ARROW:
             view.position[1] -= 30;
             break;
-        case 39: // right
+
+        case KEYS.RIGHT_ARROW:
             view.position[0] += 30;
             break;
-        case 40: // down
+
+        case KEYS.DOWN_ARROW:
             view.position[1] += 30;
             break;
 
-        case 190: //.
+        case KEYS.PERIOD:
             rotate(Math.PI / 12);
             break;
 
-        case 188: //,
+        case KEYS.COMMA:
             rotate(-Math.PI / 12);
             break;
     }
 
-    lastEvent = event;
-    heldKeys[event.which] = true;
+    var isMetaDown = (heldKeys[KEYS.LEFT_META] > 0 || heldKeys[KEYS.RIGHT_META] > 0);
+    var isShiftDown = (heldKeys[KEYS.SHIFT] > 0);
 
-    drawScreen();
+    if( isMetaDown && theEvent.which === KEYS.KEY_Z )
+    {
+        if( isShiftDown )
+        {
+            undoManager.redo();
+        }
+        else
+        {
+            undoManager.undo();
+        }
+        theEvent.stopPropagation();
+        result = false;
+    }
+
+    if( theEvent.which === KEYS.KEY_H )
+    {
+        undoManager.redo();
+    }
+
+    heldKeys[theEvent.which] = (heldKeys[theEvent.which]++) || 1;
+
+    return result;
 }
 
 function keyUp()
 {
-    lastEvent = null;
-
-    if (lastEvent && lastEvent.which == event.which)
-    {
-        return;
-    }
-
-    // These will probably be useful later.
-    switch( event.which )
-    {
-        case 16: // shift
-        case 17: // ctrl
-        case 18: // alt
-        case 37: // left
-        case 38: // up
-        case 39: // right
-        case 40: // down
-        case 32: // space
-            return;
-    }
-
-    delete(heldKeys[event.keyCode]); // Why is this keyCode and not which?
+    heldKeys[event.which]--;
 }
 

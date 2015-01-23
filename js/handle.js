@@ -29,6 +29,7 @@ Handle.prototype.draw = function(ctx, info)
     var y = v[1];
     var w = Handle.HANDLE_RADIUS;
     var h = Handle.HANDLE_RADIUS;
+
     ctx.fillStyle = polygonStrokeColor;
     ctx.strokeStyle = polygonStrokeColor;
     ctx.strokeRect(x-w, y-w, 2*w, 2*h);
