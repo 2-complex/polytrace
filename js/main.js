@@ -467,16 +467,16 @@ function keyDown(theEvent)
     var isMetaDown = (heldKeys[KEYS.LEFT_META] > 0 || heldKeys[KEYS.RIGHT_META] > 0);
     var isShiftDown = (heldKeys[KEYS.SHIFT] > 0);
 
-    if(isMetaDown && theEvent.which === KEYS.KEY_Z) // Command + Z
+    if( isMetaDown && theEvent.which === KEYS.KEY_Z )
     {
-        undoManager.undo();
-        theEvent.stopPropagation();
-        result = false;
-    }
-
-    if(isMetaDown && isShiftDown && theEvent.which === KEYS.KEY_Z) // Command + Shift + Z
-    {
-        undoManager.redo();
+        if( isShiftDown )
+        {
+            undoManager.redo();
+        }
+        else
+        {
+            undoManager.undo();
+        }
         theEvent.stopPropagation();
         result = false;
     }

@@ -37,9 +37,6 @@ PolyTraceDocument.prototype.removeImage = function(imageInfo)
 
 PolyTraceDocument.prototype.addPolygon = function(poly)
 {
-    console.log("adding polygon");
-    console.dir(this);
-
     this.polygons.push(poly);
     this.rootNode.add(poly);
 }
