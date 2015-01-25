@@ -383,15 +383,12 @@ function mouseMove(event)
 {
     var v = [event.offsetX, event.offsetY];
 
-console.log(v);
-/*
     var params = {
         polyTraceDocument : polyTraceDocument,
         worldLocation : canvasToWorld(v),
         event : event
     };
     toolSelector.currentTool().mouseMove(params);
-*/
 }
 
 function mouseUp(event)
