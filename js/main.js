@@ -2,10 +2,6 @@ var body;
 var canvas;
 var ctx;
 var exportButton;
-var moveButton;
-var editButton;
-var undoButton;
-var redoButton;
 var exportWindow = null;
 
 var heldKeys = {};
@@ -13,25 +9,14 @@ var heldKeys = {};
 var view = new Node();
 var undoManager = new UndoManager(drawScreen);
 var polyTraceDocument = new PolyTraceDocument();
+var toolSelector = new ToolSelector();
 
 var LOOP_ID = null;
 var APP_STATE = null;
 
-var polygonTool = new PolygonTool();
-var handTool = new HandTool();
-var editTool = new EditTool();
-
-var selectedTool = polygonTool;
-var tempTool = null;
-
 var math = o3djs.math;
 var matrix4 = o3djs.math.matrix4;
 
-
-function currentTool()
-{
-    return tempTool || selectedTool;
-}
 
 // Colors of things
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
@@ -43,9 +28,6 @@ $(document).ready(function ()
     canvas = $('#canvas');
     exportButton = $('button.export');
 
-    polyButton = $('button.poly');
-    handButton = $('button.hand');
-    editButton = $('button.edit');
     undoButton = $('button.undo');
     redoButton = $('button.redo');
 
@@ -101,9 +83,7 @@ $(document).ready(function ()
 
     exportButton.on('mousedown', exportJSON);
 
-    polyButton.on('mousedown', function() {selectedTool = polygonTool;} );
-    handButton.on('mousedown', function() {selectedTool = handTool;});
-    editButton.on('mousedown', function() {selectedTool = editTool;} );
+    toolSelector.init();
 
     undoButton.on('mousedown', function() {undoManager.undo();});
     redoButton.on('mousedown', function() {undoManager.redo();});
@@ -310,7 +290,7 @@ function drawScreen()
 
 function manageCursor()
 {
-    var tool = currentTool();
+    var tool = toolSelector.currentTool();
 
     if( APP_STATE == 'title' )
     {
@@ -342,10 +322,10 @@ function mouseDown(event)
 
         if( event.button == 1 )
         {
-            tempTool = handTool;
+            toolSelector.setTempTool("hand");
         }
 
-        currentTool().mouseDown({
+        toolSelector.currentTool().mouseDown({
             polyTraceDocument : polyTraceDocument,
             worldLocation : canvasToWorld(v),
             event : event,
@@ -360,7 +340,7 @@ function doubleClick()
 {
     if( APP_STATE == 'mode' )
     {
-        currentTool().doubleClick({
+        toolSelector.currentTool().doubleClick({
             polyTraceDocument : polyTraceDocument,
             event : event});
     }
@@ -403,12 +383,15 @@ function mouseMove(event)
 {
     var v = [event.offsetX, event.offsetY];
 
+console.log(v);
+/*
     var params = {
         polyTraceDocument : polyTraceDocument,
         worldLocation : canvasToWorld(v),
         event : event
     };
-    currentTool().mouseMove(params);
+    toolSelector.currentTool().mouseMove(params);
+*/
 }
 
 function mouseUp(event)
@@ -420,9 +403,9 @@ function mouseUp(event)
         worldLocation : canvasToWorld(v),
         event : event
     };
-    currentTool().mouseUp(params);
+    toolSelector.currentTool().mouseUp(params);
 
-    tempTool = null;
+    toolSelector.setTempTool(null);
 }
 
 function keyDown(theEvent)
@@ -436,7 +419,7 @@ function keyDown(theEvent)
         break;
 
         case KEYS.DASH:
-            zoom(1.0 / 1.1);
+            zoom(1.0/1.1);
         break;
 
         case KEYS.LEFT_ARROW:
@@ -472,9 +455,9 @@ function keyDown(theEvent)
         if( isShiftDown )
         {
             undoManager.redo();
-        }
+}
         else
-        {
+{
             undoManager.undo();
         }
         theEvent.stopPropagation();
@@ -489,7 +472,7 @@ function keyDown(theEvent)
     heldKeys[theEvent.which] = (heldKeys[theEvent.which]++) || 1;
 
     return result;
-}
+    }
 
 function keyUp()
 {
