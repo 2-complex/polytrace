@@ -29,7 +29,7 @@ ToolSelector.prototype.init = function()
         this.buttons[info.name] = $('button.' + info.name);
         this.buttons[info.name].on('mousedown', function()
         {
-            toolSelector.selectedTool = toolSelector.tools[$(this).attr("name")];
+            toolSelector.selectedTool = toolSelector.tools[$(this).attr("toolName")];
             return true;
         });
     }
