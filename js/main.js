@@ -88,6 +88,7 @@ $(document).ready(function ()
 
     toolSet = new ToolSet(
     {'poly': PolygonTool,
+     'bezier': BezierTool,
      'hand': HandTool,
      'edit': EditTool} );
 
