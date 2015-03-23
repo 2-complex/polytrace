@@ -22,7 +22,6 @@ var matrix4 = o3djs.math.matrix4;
 
 // Colors of things
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
-var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
 
 
 $(document).ready(function ()

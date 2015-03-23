@@ -1,10 +1,26 @@
 
+
+var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
+var bezierHandleColor = "rgba(0, 100, 100, 1.0)";
+
 Polygon = function()
 {
     this.vertices = [];
-    this.bezier = [];
     this.handles = [];
     this.closed = false;
+}
+
+Polygon.prototype.drawSegment = function(convert, info, i)
+{
+    var n = this.vertices.length;
+
+    var v = convert(matrix4.transformPoint2(info.matrix, this.vertices[(i+1)%n].center));
+    var f = convert(matrix4.transformVector2(info.matrix, this.vertices[i].front));
+    var b = convert(matrix4.transformVector2(info.matrix, this.vertices[(i+1)%n].back));
+    ctx.bezierCurveTo(
+        f[0], f[1],
+        b[0], b[1],
+        v[0], v[1]);
 }
 
 Polygon.prototype.draw = function(ctx, info)
@@ -15,61 +31,43 @@ Polygon.prototype.draw = function(ctx, info)
     {
         ctx.beginPath();
         ctx.lineWidth = 2;
+        ctx.fillStyle = polygonStrokeColor;
         ctx.strokeStyle = polygonStrokeColor;
 
-        var v = convert(matrix4.transformPoint2(info.matrix, this.vertices[0]));
+        var v = convert(matrix4.transformPoint2(info.matrix, this.vertices[0].center));
         ctx.moveTo(v[0], v[1]);
-        var last_x = v[0];
-        var last_y = v[1];
 
-        var i = 1;
-        for ( ; i<this.vertices.length; i++ )
+        // for ( var i = 0; i < this.vertices.length - (this.closed ? 0 : 1); i++ )
+        for ( var i = 0; i < this.vertices.length - 1 ; i++ )
         {
-            var v = convert(matrix4.transformPoint2(info.matrix, this.vertices[i]));
-            var b = convert(matrix4.transformVector2(info.matrix, this.bezier[i-1].back));
-            var f = convert(matrix4.transformVector2(info.matrix, this.bezier[i-1].front));
-            ctx.bezierCurveTo(last_x + b[0], last_y + b[1], v[0], v[1], v[0] + f[0], v[1] + f[1]);
-            last_x = v[0];
-            last_y = v[1];
-        }
-
-        if( this.closed )
-        {
-            var v = convert(matrix4.transformPoint2(info.matrix, this.vertices[0]));
-            var b = convert(matrix4.transformVector2(info.matrix, this.bezier[i-1].back));
-            var f = convert(matrix4.transformVector2(info.matrix, this.bezier[i-1].front));
-            ctx.bezierCurveTo(last_x + b[0], last_y + b[1], v[0], v[1], v[0] + f[0], v[1] + f[1]);
+            this.drawSegment(convert, info, i);
         }
 
         ctx.stroke();
     }
 
-    for ( var i=0; i<this.vertices.length; i++ )
+    for ( var i=0; i<this.handles.length; i++ )
     {
         this.handles[i].draw(ctx, info);
     }
 }
 
-Polygon.prototype.add = function(newVertex)
+Polygon.prototype.add = function(v)
 {
-    var newVertexCopy = [newVertex[0], newVertex[1]];
-    this.vertices.push(newVertexCopy);
-    this.handles.push(new Handle(newVertexCopy));
+    var newv = {
+        center: [v[0], v[1]],
+        front: [v[0], v[1]],
+        back: [v[0], v[1]] };
 
-    if( this.vertices.length > 1 )
-    {
-        var b = [0,0];
-        var f = [0,0];
-        this.bezier.push({back:b, front:f});
-        this.handles.push(new Handle(b));
-        this.handles.push(new Handle(f));
-    }
+    this.vertices.push(newv);
 
+    this.handles.push(new Handle(newv.center));
+    this.handles.push(new BezierHandle(newv.back, newv.center));
+    this.handles.push(new BezierHandle(newv.front, newv.center));
 }
 
 Polygon.prototype.close = function()
 {
     this.closed = true;
-    this.bezier.push({back:[0,0], front:[0,0]});
 }
 

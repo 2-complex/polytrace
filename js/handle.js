@@ -1,4 +1,7 @@
 
+
+var handleColor = "rgba(0, 255, 50, 1.0)";
+
 function Handle(position)
 {
     Draggable.call(this);
@@ -7,7 +10,7 @@ function Handle(position)
 
 Handle.prototype = inherit([Draggable]);
 
-Handle.HANDLE_RADIUS = 4;
+Handle.RADIUS = 4;
 
 Handle.prototype.clickIn = function(screenloc)
 {
@@ -16,8 +19,8 @@ Handle.prototype.clickIn = function(screenloc)
     var dx = screenloc[0] - canvasLoc[0];
     var dy = screenloc[1] - canvasLoc[1];
 
-    return dx < Handle.HANDLE_RADIUS && dx > -Handle.HANDLE_RADIUS &&
-           dy < Handle.HANDLE_RADIUS && dy > -Handle.HANDLE_RADIUS;
+    return dx < Handle.RADIUS && dx > -Handle.RADIUS &&
+           dy < Handle.RADIUS && dy > -Handle.RADIUS;
 }
 
 Handle.prototype.draw = function(ctx, info)
@@ -27,11 +30,11 @@ Handle.prototype.draw = function(ctx, info)
 
     var x = v[0]
     var y = v[1];
-    var w = Handle.HANDLE_RADIUS;
-    var h = Handle.HANDLE_RADIUS;
+    var w = Handle.RADIUS;
+    var h = Handle.RADIUS;
 
-    ctx.fillStyle = polygonStrokeColor;
-    ctx.strokeStyle = polygonStrokeColor;
+    ctx.fillStyle = handleColor;
+    ctx.strokeStyle = handleColor;
     ctx.strokeRect(x-w, y-w, 2*w, 2*h);
 }
 
