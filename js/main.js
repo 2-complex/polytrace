@@ -17,25 +17,12 @@ var polyTraceDocument = new PolyTraceDocument();
 var LOOP_ID = null;
 var APP_STATE = null;
 
-var polygonTool = new PolygonTool();
-var handTool = new HandTool();
-var editTool = new EditTool();
-
-var selectedTool = polygonTool;
-var tempTool = null;
-
 var math = o3djs.math;
 var matrix4 = o3djs.math.matrix4;
 
-
-function currentTool()
-{
-    return tempTool || selectedTool;
-}
-
 // Colors of things
 var gridColor = "hsla(0, 0%, 50%, 0.5)";
-var polygonStrokeColor = "rgba(0, 255, 50, 1.0)";
+
 
 $(document).ready(function ()
 {
@@ -43,9 +30,6 @@ $(document).ready(function ()
     canvas = $('#canvas');
     exportButton = $('button.export');
 
-    polyButton = $('button.poly');
-    handButton = $('button.hand');
-    editButton = $('button.edit');
     undoButton = $('button.undo');
     redoButton = $('button.redo');
 
@@ -101,9 +85,11 @@ $(document).ready(function ()
 
     exportButton.on('mousedown', exportJSON);
 
-    polyButton.on('mousedown', function() {selectedTool = polygonTool;} );
-    handButton.on('mousedown', function() {selectedTool = handTool;});
-    editButton.on('mousedown', function() {selectedTool = editTool;} );
+    toolSet = new ToolSet(
+    {'poly': PolygonTool,
+     'bezier': BezierTool,
+     'hand': HandTool,
+     'edit': EditTool} );
 
     undoButton.on('mousedown', function() {undoManager.undo();});
     redoButton.on('mousedown', function() {undoManager.redo();});
@@ -310,7 +296,7 @@ function drawScreen()
 
 function manageCursor()
 {
-    var tool = currentTool();
+    var tool = toolSet.currentTool();
 
     if( APP_STATE == 'title' )
     {
@@ -342,10 +328,10 @@ function mouseDown(event)
 
         if( event.button == 1 )
         {
-            tempTool = handTool;
+            toolSet.tempTool = toolSet['hand'];
         }
 
-        currentTool().mouseDown({
+        toolSet.currentTool().mouseDown({
             polyTraceDocument : polyTraceDocument,
             worldLocation : canvasToWorld(v),
             event : event,
@@ -360,7 +346,7 @@ function doubleClick()
 {
     if( APP_STATE == 'mode' )
     {
-        currentTool().doubleClick({
+        toolSet.currentTool().doubleClick({
             polyTraceDocument : polyTraceDocument,
             event : event});
     }
@@ -408,7 +394,7 @@ function mouseMove(event)
         worldLocation : canvasToWorld(v),
         event : event
     };
-    currentTool().mouseMove(params);
+    toolSet.currentTool().mouseMove(params);
 }
 
 function mouseUp(event)
@@ -420,9 +406,9 @@ function mouseUp(event)
         worldLocation : canvasToWorld(v),
         event : event
     };
-    currentTool().mouseUp(params);
+    toolSet.currentTool().mouseUp(params);
 
-    tempTool = null;
+    toolSet.tempTool = null;
 }
 
 function keyDown(theEvent)

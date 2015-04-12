@@ -17,7 +17,7 @@ PolygonTool.prototype.mouseDown = function(eventInfo)
 
     if( this.currentPolygon.vertices.length > 0 )
     {
-        var lastp = this.currentPolygon.vertices[this.currentPolygon.vertices.length - 1];
+        var lastp = this.currentPolygon.vertices[this.currentPolygon.vertices.length - 1].center;
         if( ! (eventInfo.worldLocation[0] == lastp[0] &&
                eventInfo.worldLocation[1] == lastp[1] ) )
         {
