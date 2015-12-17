@@ -27,5 +27,3 @@ ToolSet.prototype.currentTool = function()
     return this.tempTool || this.selectedTool;
 }
 
-
-

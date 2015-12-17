@@ -16,20 +16,20 @@ Node.prototype = inherit([Draggable]);
 Node.prototype.add = function(drawable)
 {
     this.children.push(drawable);
-}
+};
 
 Node.prototype.remove = function(drawable)
 {
     var index = this.children.indexOf(drawable);
     this.children.splice(index, 1);
-}
+};
 
 Node.prototype.draw = function(ctx, info)
 {
     info = info || {};
     info.matrix = info.matrix || matrix4.identity();
 
-    this.positionHandle.draw(ctx, info);
+    // this.positionHandle.draw(ctx, info);
 
     var temp = info.matrix;
     info.matrix = matrix4.compose(info.matrix, this.getMatrix());
@@ -40,7 +40,7 @@ Node.prototype.draw = function(ctx, info)
     }
 
     info.matrix = temp;
-}
+};
 
 Node.prototype.getMatrix = function()
 {
@@ -52,7 +52,7 @@ Node.prototype.getMatrix = function()
         [0, 0, 1, 0],
         [this.position[0], this.position[1], 0, 1]
     ];
-}
+};
 
 Node.prototype.zoom = function(factor)
 {
@@ -65,23 +65,23 @@ Node.prototype.zoom = function(factor)
     {
         this.scaleFactor = 1.0 / 10.0;
     }
-}
+};
 
 Node.prototype.rotate = function(theta)
 {
     this.rotation += theta;
-}
+};
 
 Node.prototype.getDraggables = function()
 {
-    return [this.positionHandle];
-}
+    return [/*this.positionHandle*/];
+};
 
 Node.prototype.setPosition = function(x, y)
 {
     this.position[0] = x;
     this.position[1] = y;
-}
+};
 
 Node.prototype.startDrag = function(event)
 {
@@ -90,14 +90,14 @@ Node.prototype.startDrag = function(event)
     var v = canvasToWorld([event.offsetX, event.offsetY]);
     this.dragDiff[0] = this.position[0] - v[0];
     this.dragDiff[1] = this.position[1] - v[1];
-}
+};
 
 Node.prototype.drag = function(event)
 {
     var v = canvasToWorld([event.offsetX, event.offsetY]);
     this.position[0] = this.dragDiff[0] + v[0];
     this.position[1] = this.dragDiff[1] + v[1];
-}
+};
 
 Node.prototype.finishDrag = function(event)
 {
@@ -106,5 +106,5 @@ Node.prototype.finishDrag = function(event)
     undoManager.push(
         Node.prototype.setPosition, this, this.startingPosition,
         Node.prototype.setPosition, this, [this.position[0], this.position[1]]);
-}
+};
 
