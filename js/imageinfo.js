@@ -9,7 +9,7 @@ function ImageInfo(img, position)
 
 ImageInfo.prototype = inherit([Draggable]);
 
-ImageInfo.prototype.clickIn = function(screenloc)
+ImageInfo.prototype.clickIn = function(screenloc, info)
 {
     var canvasLoc = canvasToWorld(screenloc); // WAT?
 

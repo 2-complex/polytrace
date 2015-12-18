@@ -1,8 +1,19 @@
 
-function UndoManager(drawScreen)
+function UndoManager()
 {
     this.head = -1;
     this.undoList = [];
+    this.drawScreen = function(){};
+};
+
+UndoManager.get = function()
+{
+    UndoManager.instance = UndoManager.instance || new UndoManager();
+    return UndoManager.instance;
+};
+
+UndoManager.prototype.setDrawScreen = function(drawScreen)
+{
     this.drawScreen = drawScreen;
 }
 
@@ -16,7 +27,7 @@ UndoManager.prototype.undo = function()
     }
 
     this.drawScreen();
-}
+};
 
 UndoManager.prototype.redo = function()
 {
@@ -28,7 +39,7 @@ UndoManager.prototype.redo = function()
     }
 
     this.drawScreen();
-}
+};
 
 UndoManager.prototype.push = function(undoFunction, undoThis, undoArgList, redoFunction, redoThis, redoArgList)
 {
@@ -40,5 +51,5 @@ UndoManager.prototype.push = function(undoFunction, undoThis, undoArgList, redoF
         undoFunction:undoFunction, undoThis:undoThis, undoArgList:undoArgList,
         redoFunction:redoFunction, redoThis:redoThis, redoArgList:redoArgList});
     this.head++;
-}
+};
 
