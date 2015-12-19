@@ -53,7 +53,8 @@
             "js/polytracedocument.js",
             "js/imageinfo.js",
             "js/constants.js",
-            "js/main.js",
+            "css/main.css",
+            "css/font-awesome.min.css",
             ],
             function()
             {
@@ -128,7 +129,6 @@
                 exportWindow = null;
             }
         }
-
 
         function clearScreen()
         {
